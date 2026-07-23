@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import { accountRouter } from "./routes/account";
 import { authRouter } from "./routes/auth";
@@ -10,6 +11,7 @@ import { usersRouter } from "./routes/users";
 const app = express();
 const port = process.env.PORT ?? 3001;
 
+app.use(cors({ origin: process.env.WEB_APP_ORIGIN ?? "http://localhost:3000" }));
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
