@@ -13,6 +13,8 @@
     "@defa/shared": "*",
     "expo": "~51.0.0",
     "expo-camera": "~15.0.0",
+    "expo-network": "~6.0.0",
+    "expo-secure-store": "~13.0.0",
     "expo-sqlite": "~14.0.0",
     "react": "18.2.0",
     "react-native": "0.74.5"

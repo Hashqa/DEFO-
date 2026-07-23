@@ -1,27 +1,64 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { AppState, SafeAreaView, StyleSheet } from "react-native";
+import { clearToken, getToken } from "./src/lib/api";
+import { initDb } from "./src/lib/db";
+import { syncPendingDocuments } from "./src/lib/sync";
+import ClientsScreen from "./src/screens/ClientsScreen";
+import DocumentsScreen from "./src/screens/DocumentsScreen";
+import LoginScreen from "./src/screens/LoginScreen";
+import NewDocumentScreen from "./src/screens/NewDocumentScreen";
+
+type Screen = "login" | "documents" | "newDocument" | "clients";
 
 /**
- * Point d'entrée de l'app mobile. Le mode hors-ligne (scan + création de
- * devis/factures sans réseau, synchronisation ensuite) repose sur une base
- * SQLite locale (expo-sqlite) synchronisée avec l'API quand le réseau revient.
+ * Pas de librairie de navigation : l'app reste volontairement simple
+ * (4 écrans), donc un switch d'état suffit et évite une dépendance de plus.
  */
 export default function App() {
+  const [screen, setScreen] = useState<Screen>("login");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      await initDb();
+      const token = await getToken();
+      setScreen(token ? "documents" : "login");
+      setReady(true);
+    })();
+  }, []);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        syncPendingDocuments();
+      }
+    });
+    return () => subscription.remove();
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    await clearToken();
+    setScreen("login");
+  }, []);
+
+  if (!ready) return null;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>DEFA</Text>
-      <Text>Gestion de devis &amp; factures — en construction.</Text>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      {screen === "login" && <LoginScreen onLoggedIn={() => setScreen("documents")} />}
+      {screen === "documents" && (
+        <DocumentsScreen
+          onNewDocument={() => setScreen("newDocument")}
+          onClients={() => setScreen("clients")}
+          onLogout={handleLogout}
+        />
+      )}
+      {screen === "newDocument" && <NewDocumentScreen onDone={() => setScreen("documents")} />}
+      {screen === "clients" && <ClientsScreen onBack={() => setScreen("documents")} />}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
+  safeArea: { flex: 1 },
 });
