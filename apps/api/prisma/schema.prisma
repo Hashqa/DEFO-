@@ -1,0 +1,145 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  OWNER
+  ASSISTANT
+}
+
+enum DocumentDirection {
+  PURCHASE
+  SALE
+}
+
+enum BillingKind {
+  SERVICE
+  MATERIAL_AND_LABOR
+}
+
+enum DocumentStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REFUSED
+  PAID
+  OVERDUE
+}
+
+enum PaymentSource {
+  BANK_RECONCILIATION
+  MANUAL
+}
+
+/// Un compte = un indépendant/entreprise, isolé des autres (multi-tenant).
+model Account {
+  id           String    @id @default(cuid())
+  companyName  String
+  vatNumber    String
+  bceNumber    String
+  logoUrl      String?
+  brandColor   String?
+  createdAt    DateTime  @default(now())
+
+  users        User[]
+  clients      Client[]
+  projects     Project[]
+  documents    BillingDocument[]
+  payments     Payment[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  email     String   @unique
+  fullName  String
+  role      UserRole @default(OWNER)
+
+  @@index([accountId])
+}
+
+model Client {
+  id         String   @id @default(cuid())
+  account    Account  @relation(fields: [accountId], references: [id])
+  accountId  String
+  name       String
+  vatNumber  String?
+  email      String?
+  address    String?
+  isBusiness Boolean  @default(false)
+
+  projects   Project[]
+  documents  BillingDocument[]
+
+  @@index([accountId])
+}
+
+/// Regroupement de devis/factures par chantier ou projet.
+model Project {
+  id        String  @id @default(cuid())
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+  client    Client  @relation(fields: [clientId], references: [id])
+  clientId  String
+  name      String
+
+  documents BillingDocument[]
+
+  @@index([accountId])
+}
+
+model BillingDocument {
+  id             String             @id @default(cuid())
+  account        Account            @relation(fields: [accountId], references: [id])
+  accountId      String
+  client         Client             @relation(fields: [clientId], references: [id])
+  clientId       String
+  project        Project?           @relation(fields: [projectId], references: [id])
+  projectId      String?
+  direction      DocumentDirection
+  billingKind    BillingKind
+  status         DocumentStatus     @default(DRAFT)
+  sequenceNumber String
+  totalExclVat   Decimal            @db.Decimal(12, 2)
+  totalInclVat   Decimal            @db.Decimal(12, 2)
+  issuedAt       DateTime           @default(now())
+  dueAt          DateTime?
+  peppolSentAt   DateTime?
+
+  lines          DocumentLine[]
+  payments       Payment[]
+
+  @@index([accountId])
+  @@unique([accountId, sequenceNumber])
+}
+
+model DocumentLine {
+  id          String          @id @default(cuid())
+  document    BillingDocument @relation(fields: [documentId], references: [id])
+  documentId  String
+  description String
+  quantity    Decimal         @db.Decimal(12, 2)
+  unitPrice   Decimal         @db.Decimal(12, 2)
+  vatRate     Int
+
+  @@index([documentId])
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  account    Account       @relation(fields: [accountId], references: [id])
+  accountId  String
+  document   BillingDocument @relation(fields: [documentId], references: [id])
+  documentId String
+  amount     Decimal       @db.Decimal(12, 2)
+  paidAt     DateTime      @default(now())
+  source     PaymentSource @default(MANUAL)
+
+  @@index([accountId])
+}
