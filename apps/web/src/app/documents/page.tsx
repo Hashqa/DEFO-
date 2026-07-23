@@ -46,16 +46,38 @@ export default function DocumentsPage() {
     }
   }
 
+  const [reminderResult, setReminderResult] = useState<string | null>(null);
+
+  async function runReminders() {
+    setError(null);
+    setReminderResult(null);
+    try {
+      const result = await apiFetch<{ sentCount: number; total: number }>("/documents/reminders/run", {
+        method: "POST",
+      });
+      setReminderResult(`${result.sentCount}/${result.total} relance(s) envoyée(s).`);
+      const data = await apiFetch<DocumentRecord[]>("/documents");
+      setDocuments(data);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
   return (
     <main>
       <nav>
-        <strong>Devis &amp; factures</strong> · <Link href="/clients">Clients</Link>
+        <strong>Devis &amp; factures</strong> · <Link href="/clients">Clients</Link> ·{" "}
+        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link>
       </nav>
       <h1>Devis &amp; factures</h1>
       <p>
-        <Link href="/documents/new">+ Nouveau devis/facture</Link>
+        <Link href="/documents/new">+ Nouveau devis/facture</Link>{" "}
+        <button type="button" onClick={runReminders}>
+          Envoyer les relances de paiement
+        </button>
       </p>
       {error && <p role="alert">{error}</p>}
+      {reminderResult && <p>{reminderResult}</p>}
 
       <table>
         <thead>

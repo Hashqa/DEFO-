@@ -6,6 +6,7 @@ import { clientsRouter } from "./routes/clients";
 import { documentsRouter } from "./routes/documents";
 import { projectsRouter } from "./routes/projects";
 import { publicRouter } from "./routes/public";
+import { statsRouter } from "./routes/stats";
 import { usersRouter } from "./routes/users";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/users", usersRouter);
 app.use("/clients", clientsRouter);
 app.use("/projects", projectsRouter);
 app.use("/documents", documentsRouter);
+app.use("/stats", statsRouter);
 app.use("/public", publicRouter);
 
 app.listen(port, () => {

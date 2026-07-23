@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth, requireOwner } from "../middleware/auth";
 import {
   convertQuoteByOwnerDecision,
   createDocument,
@@ -8,6 +8,7 @@ import {
   requestClientValidation,
 } from "../services/documents";
 import { generateDocumentPdf } from "../services/pdf";
+import { sendPaymentReminders } from "../services/reminders";
 
 export const documentsRouter = Router();
 documentsRouter.use(requireAuth);
@@ -66,6 +67,13 @@ documentsRouter.post("/:id/convert", async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
   }
+});
+
+/** Déclenche manuellement les relances de paiement pour ce compte (utile pour tester ; en production, un cron appelle le script `reminders:run`). */
+documentsRouter.post("/reminders/run", requireOwner, async (req, res) => {
+  const accountId = req.accountId!;
+  const result = await sendPaymentReminders(undefined, accountId);
+  res.json(result);
 });
 
 /** Génère le lien de validation en ligne à envoyer au client. */

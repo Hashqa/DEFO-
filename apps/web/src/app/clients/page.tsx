@@ -54,7 +54,8 @@ export default function ClientsPage() {
   return (
     <main>
       <nav>
-        <Link href="/documents">Devis &amp; factures</Link> · <strong>Clients</strong>
+        <Link href="/documents">Devis &amp; factures</Link> · <strong>Clients</strong> ·{" "}
+        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link>
       </nav>
       <h1>Clients</h1>
 

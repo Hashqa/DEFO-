@@ -130,6 +130,9 @@ model BillingDocument {
   /// Jeton permettant au client de consulter/valider un devis en ligne sans compte.
   acceptanceToken String? @unique
 
+  /// Dernière relance de paiement envoyée (évite de spammer le client).
+  lastReminderSentAt DateTime?
+
   lines          DocumentLine[]
   payments       Payment[]
 
