@@ -87,7 +87,7 @@ export async function listDocuments(
 export async function getDocument(accountId: string, id: string) {
   return prisma.billingDocument.findFirst({
     where: { id, accountId },
-    include: { lines: true, client: true, project: true },
+    include: { lines: true, client: true, project: true, account: true },
   });
 }
 

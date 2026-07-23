@@ -7,6 +7,7 @@ import {
   listDocuments,
   requestClientValidation,
 } from "../services/documents";
+import { generateDocumentPdf } from "../services/pdf";
 
 export const documentsRouter = Router();
 documentsRouter.use(requireAuth);
@@ -41,6 +42,19 @@ documentsRouter.post("/", async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
   }
+});
+
+documentsRouter.get("/:id/pdf", async (req, res) => {
+  const accountId = req.accountId!;
+  const document = await getDocument(accountId, req.params.id);
+  if (!document) {
+    res.status(404).json({ error: "Devis/facture introuvable" });
+    return;
+  }
+  const pdf = await generateDocumentPdf(document);
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `inline; filename="${document.sequenceNumber}.pdf"`);
+  res.send(pdf);
 });
 
 /** Décision seule de l'indépendant : conversion immédiate. */
