@@ -18,6 +18,8 @@ export interface Account {
   bceNumber: string;
   logoUrl?: string;
   brandColor?: string;
+  iban?: string;
+  bic?: string;
   createdAt: string;
 }
 

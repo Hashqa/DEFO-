@@ -1,4 +1,5 @@
 import express from "express";
+import { accountRouter } from "./routes/account";
 import { authRouter } from "./routes/auth";
 import { clientsRouter } from "./routes/clients";
 import { documentsRouter } from "./routes/documents";
@@ -16,6 +17,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/account", accountRouter);
 app.use("/users", usersRouter);
 app.use("/clients", clientsRouter);
 app.use("/projects", projectsRouter);

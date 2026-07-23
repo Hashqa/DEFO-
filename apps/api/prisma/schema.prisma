@@ -49,6 +49,8 @@ model Account {
   bceNumber    String
   logoUrl      String?
   brandColor   String?
+  iban         String?
+  bic          String?
   createdAt    DateTime  @default(now())
 
   users        User[]

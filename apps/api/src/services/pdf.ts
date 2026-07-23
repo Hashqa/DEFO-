@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
 import type { Account, BillingDocument, Client, DocumentLine } from "@prisma/client";
+import { buildEpcQrPayload, generateEpcQrPng } from "./epcQr";
 
 type FullDocument = BillingDocument & {
   lines: DocumentLine[];
@@ -16,9 +17,22 @@ const DOCUMENT_TITLES: Record<FullDocument["type"], string> = {
  * Génère le PDF légal d'un devis/facture : mentions obligatoires belges
  * (n° BCE, TVA, numérotation séquentielle, détail des taux de TVA) — voir
  * section 3.3 du cahier des charges. Conservé pour la facturation B2C ;
- * la facturation B2B passe par Peppol en plus de ce PDF.
+ * la facturation B2B passe par Peppol en plus de ce PDF. Inclut le QR de
+ * paiement EPC (section 3.4) si le compte a renseigné son IBAN.
  */
-export function generateDocumentPdf(document: FullDocument): Promise<Buffer> {
+export async function generateDocumentPdf(document: FullDocument): Promise<Buffer> {
+  let paymentQrPng: Buffer | null = null;
+  if (document.type === "INVOICE" && document.account.iban) {
+    const payload = buildEpcQrPayload({
+      beneficiaryName: document.account.companyName,
+      iban: document.account.iban,
+      bic: document.account.bic ?? undefined,
+      amount: Number(document.totalInclVat),
+      remittanceInfo: document.sequenceNumber,
+    });
+    paymentQrPng = await generateEpcQrPng(payload);
+  }
+
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: "A4", margin: 50 });
     const chunks: Buffer[] = [];
@@ -71,6 +85,13 @@ export function generateDocumentPdf(document: FullDocument): Promise<Buffer> {
     doc.text(`Total HT : ${Number(document.totalExclVat).toFixed(2)} €`, { align: "right" });
     doc.text(`Total TVAC : ${Number(document.totalInclVat).toFixed(2)} €`, { align: "right" });
     doc.font("Helvetica");
+
+    if (paymentQrPng) {
+      doc.moveDown(1.5);
+      doc.fontSize(10).fillColor("black").text("Scannez pour payer (QR EPC / virement SEPA)", { align: "center" });
+      doc.image(paymentQrPng, (doc.page.width - 150) / 2, doc.y + 5, { width: 150 });
+      doc.moveDown(10);
+    }
 
     doc.moveDown(2);
     doc.fontSize(8).fillColor("gray").text(
