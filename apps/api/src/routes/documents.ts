@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAccount } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 import {
   convertQuoteByOwnerDecision,
   createDocument,
@@ -9,7 +9,7 @@ import {
 } from "../services/documents";
 
 export const documentsRouter = Router();
-documentsRouter.use(requireAccount);
+documentsRouter.use(requireAuth);
 
 documentsRouter.get("/", async (req, res) => {
   const accountId = req.accountId!;

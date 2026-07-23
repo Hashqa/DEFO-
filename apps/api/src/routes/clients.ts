@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { prisma } from "../db";
-import { requireAccount } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 
 export const clientsRouter = Router();
-clientsRouter.use(requireAccount);
+clientsRouter.use(requireAuth);
 
 clientsRouter.get("/", async (req, res) => {
   const accountId = req.accountId!;

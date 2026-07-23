@@ -1,8 +1,10 @@
 import express from "express";
+import { authRouter } from "./routes/auth";
 import { clientsRouter } from "./routes/clients";
 import { documentsRouter } from "./routes/documents";
 import { projectsRouter } from "./routes/projects";
 import { publicRouter } from "./routes/public";
+import { usersRouter } from "./routes/users";
 
 const app = express();
 const port = process.env.PORT ?? 3001;
@@ -13,6 +15,8 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+app.use("/auth", authRouter);
+app.use("/users", usersRouter);
 app.use("/clients", clientsRouter);
 app.use("/projects", projectsRouter);
 app.use("/documents", documentsRouter);
