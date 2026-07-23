@@ -17,6 +17,11 @@ enum DocumentDirection {
   SALE
 }
 
+enum DocumentType {
+  QUOTE
+  INVOICE
+}
+
 enum BillingKind {
   SERVICE
   MATERIAL_AND_LABOR
@@ -102,6 +107,7 @@ model BillingDocument {
   clientId       String
   project        Project?           @relation(fields: [projectId], references: [id])
   projectId      String?
+  type           DocumentType
   direction      DocumentDirection
   billingKind    BillingKind
   status         DocumentStatus     @default(DRAFT)
@@ -112,11 +118,20 @@ model BillingDocument {
   dueAt          DateTime?
   peppolSentAt   DateTime?
 
+  /// Devis d'origine lorsque ce document est une facture issue d'une conversion.
+  convertedFromQuote   BillingDocument?  @relation("QuoteToInvoice", fields: [convertedFromQuoteId], references: [id])
+  convertedFromQuoteId String?          @unique
+  convertedToInvoice   BillingDocument? @relation("QuoteToInvoice")
+
+  /// Jeton permettant au client de consulter/valider un devis en ligne sans compte.
+  acceptanceToken String? @unique
+
   lines          DocumentLine[]
   payments       Payment[]
 
   @@index([accountId])
-  @@unique([accountId, sequenceNumber])
+  @@index([accountId, type])
+  @@unique([accountId, type, sequenceNumber])
 }
 
 model DocumentLine {

@@ -8,6 +8,8 @@ export type DocumentStatus = "DRAFT" | "SENT" | "ACCEPTED" | "REFUSED" | "PAID" 
 
 export type DocumentDirection = "PURCHASE" | "SALE";
 
+export type DocumentType = "QUOTE" | "INVOICE";
+
 /** Une entreprise/indépendant inscrit — tenant isolé du SaaS. */
 export interface Account {
   id: string;
@@ -60,6 +62,7 @@ export interface BillingDocument {
   accountId: string;
   clientId: string;
   projectId?: string;
+  type: DocumentType;
   direction: DocumentDirection;
   billingKind: BillingKind;
   status: DocumentStatus;
@@ -70,7 +73,11 @@ export interface BillingDocument {
   issuedAt: string;
   dueAt?: string;
   peppolSentAt?: string;
+  convertedFromQuoteId?: string;
+  acceptanceToken?: string;
 }
+
+export type ConversionMode = "OWNER_DECISION" | "CLIENT_VALIDATION";
 
 export interface Payment {
   id: string;
