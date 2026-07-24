@@ -2,8 +2,15 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../db";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
+if (!process.env.JWT_SECRET) {
+  throw new Error(
+    "JWT_SECRET non configuré — obligatoire pour signer les tokens (voir .env.example), aucune valeur par défaut n'est utilisée pour des raisons de sécurité"
+  );
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 const TOKEN_TTL = "30d";
+/** Hash factice comparé quand l'email n'existe pas, pour ne pas révéler par le temps de réponse si un compte existe. */
+const DUMMY_HASH = "$2a$10$CwTycUXWue0Thq9StjUM0uJ8Q8pkOw2YbHXvJZ8sN7lKqR9nJZ1Nu";
 
 export interface AuthTokenPayload {
   userId: string;
@@ -62,11 +69,10 @@ export async function register(input: RegisterInput) {
 
 export async function login(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    throw new Error("Identifiants invalides");
-  }
-  const valid = await bcrypt.compare(password, user.passwordHash);
-  if (!valid) {
+  // Toujours comparer, même si l'utilisateur n'existe pas, pour que le temps de réponse
+  // ne révèle pas si l'email est enregistré (voir DUMMY_HASH).
+  const valid = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
+  if (!user || !valid) {
     throw new Error("Identifiants invalides");
   }
   const token = signToken({ userId: user.id, accountId: user.accountId, role: user.role });

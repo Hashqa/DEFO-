@@ -44,6 +44,18 @@ export async function createDocument(accountId: string, input: CreateDocumentInp
   if (input.lines.length === 0) {
     throw new Error("Un devis/facture doit contenir au moins une ligne");
   }
+
+  const client = await prisma.client.findFirst({ where: { id: input.clientId, accountId } });
+  if (!client) {
+    throw new Error("Client introuvable");
+  }
+  if (input.projectId) {
+    const project = await prisma.project.findFirst({ where: { id: input.projectId, accountId } });
+    if (!project) {
+      throw new Error("Chantier/projet introuvable");
+    }
+  }
+
   const { totalExclVat, totalInclVat } = computeTotals(input.lines);
 
   return prisma.$transaction(async (tx) => {
