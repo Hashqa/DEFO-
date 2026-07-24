@@ -10,6 +10,8 @@ interface ClientRecord {
   name: string;
   vatNumber?: string;
   email?: string;
+  isBusiness: boolean;
+  peppolAddress?: string;
 }
 
 export default function ClientsPage() {
@@ -19,7 +21,10 @@ export default function ClientsPage() {
   const [name, setName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
   const [email, setEmail] = useState("");
+  const [isBusiness, setIsBusiness] = useState(false);
+  const [peppolAddress, setPeppolAddress] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [verifyResult, setVerifyResult] = useState<string | null>(null);
 
   async function load() {
     try {
@@ -40,12 +45,31 @@ export default function ClientsPage() {
     try {
       await apiFetch("/clients", {
         method: "POST",
-        body: JSON.stringify({ name, vatNumber: vatNumber || undefined, email: email || undefined }),
+        body: JSON.stringify({
+          name,
+          vatNumber: vatNumber || undefined,
+          email: email || undefined,
+          isBusiness,
+          peppolAddress: peppolAddress || undefined,
+        }),
       });
       setName("");
       setVatNumber("");
       setEmail("");
+      setIsBusiness(false);
+      setPeppolAddress("");
       await load();
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
+  async function verifyPeppol(id: string) {
+    setError(null);
+    setVerifyResult(null);
+    try {
+      const result = await apiFetch<{ isValid: boolean }>(`/clients/${id}/verify-peppol`, { method: "POST" });
+      setVerifyResult(result.isValid ? "Adresse Peppol valide et joignable." : "Adresse Peppol introuvable sur le réseau.");
     } catch (err) {
       setError((err as Error).message);
     }
@@ -63,9 +87,21 @@ export default function ClientsPage() {
         <input placeholder="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
         <input placeholder="N° TVA (optionnel)" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} />
         <input placeholder="Email (optionnel)" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <label>
+          <input type="checkbox" checked={isBusiness} onChange={(e) => setIsBusiness(e.target.checked)} />
+          Client professionnel (B2B)
+        </label>
+        {isBusiness && (
+          <input
+            placeholder="Adresse Peppol (ex. 0208:0123456789)"
+            value={peppolAddress}
+            onChange={(e) => setPeppolAddress(e.target.value)}
+          />
+        )}
         <button type="submit">Ajouter</button>
       </form>
       {error && <p role="alert">{error}</p>}
+      {verifyResult && <p>{verifyResult}</p>}
 
       <ul>
         {clients.map((c) => (
@@ -73,6 +109,14 @@ export default function ClientsPage() {
             {c.name}
             {c.vatNumber && ` — TVA ${c.vatNumber}`}
             {c.email && ` — ${c.email}`}
+            {c.isBusiness && c.peppolAddress && (
+              <>
+                {" "}
+                <button type="button" onClick={() => verifyPeppol(c.id)}>
+                  Vérifier Peppol
+                </button>
+              </>
+            )}
           </li>
         ))}
       </ul>

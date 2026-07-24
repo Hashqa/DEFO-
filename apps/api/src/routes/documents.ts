@@ -6,6 +6,7 @@ import {
   getDocument,
   listDocuments,
   requestClientValidation,
+  sendDocumentViaPeppol,
 } from "../services/documents";
 import { generateDocumentPdf } from "../services/pdf";
 import { sendPaymentReminders } from "../services/reminders";
@@ -74,6 +75,17 @@ documentsRouter.post("/reminders/run", requireOwner, async (req, res) => {
   const accountId = req.accountId!;
   const result = await sendPaymentReminders(undefined, accountId);
   res.json(result);
+});
+
+/** Envoie une facture de vente via Peppol (Recommand). */
+documentsRouter.post("/:id/send-peppol", async (req, res) => {
+  const accountId = req.accountId!;
+  try {
+    const result = await sendDocumentViaPeppol(accountId, req.params.id);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
 });
 
 /** Génère le lien de validation en ligne à envoyer au client. */

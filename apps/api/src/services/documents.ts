@@ -7,6 +7,7 @@ import type {
 } from "@prisma/client";
 import { prisma } from "../db";
 import { nextSequenceNumber } from "./documentNumbering";
+import { sendInvoice } from "./peppol";
 
 export interface DocumentLineInput {
   description: string;
@@ -79,7 +80,7 @@ export async function listDocuments(
 ) {
   return prisma.billingDocument.findMany({
     where: { accountId, ...filters },
-    include: { lines: true },
+    include: { lines: true, client: true },
     orderBy: { issuedAt: "desc" },
   });
 }
@@ -179,4 +180,24 @@ export async function acceptQuoteByToken(token: string) {
     });
     return invoice;
   });
+}
+
+/** Envoie une facture de vente via l'Access Point Peppol (Recommand) — section 3.3. */
+export async function sendDocumentViaPeppol(accountId: string, documentId: string) {
+  const document = await prisma.billingDocument.findFirst({
+    where: { id: documentId, accountId, type: "INVOICE", direction: "SALE" },
+    include: { lines: true, client: true, account: true },
+  });
+  if (!document) {
+    throw new Error("Facture de vente introuvable");
+  }
+  if (!document.account.peppolCompanyId) {
+    throw new Error("Entreprise pas encore enregistrée chez Recommand (voir réglages du compte)");
+  }
+  const result = await sendInvoice(document.account.peppolCompanyId, document);
+  await prisma.billingDocument.update({
+    where: { id: document.id },
+    data: { peppolSentAt: new Date() },
+  });
+  return result;
 }

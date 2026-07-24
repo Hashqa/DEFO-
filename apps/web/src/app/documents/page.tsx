@@ -8,10 +8,12 @@ import { useRequireAuth } from "../../lib/useRequireAuth";
 interface DocumentRecord {
   id: string;
   type: "QUOTE" | "INVOICE";
+  direction: "PURCHASE" | "SALE";
   sequenceNumber: string;
   status: string;
   totalInclVat: string;
-  client: { name: string };
+  client: { name: string; isBusiness: boolean; peppolAddress?: string };
+  peppolSentAt?: string;
 }
 
 export default function DocumentsPage() {
@@ -41,6 +43,17 @@ export default function DocumentsPage() {
     try {
       const url = await fetchDocumentPdfUrl(id);
       window.open(url, "_blank");
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
+  async function sendPeppol(id: string) {
+    setError(null);
+    try {
+      await apiFetch(`/documents/${id}/send-peppol`, { method: "POST" });
+      const data = await apiFetch<DocumentRecord[]>("/documents");
+      setDocuments(data);
     } catch (err) {
       setError((err as Error).message);
     }
@@ -105,6 +118,11 @@ export default function DocumentsPage() {
                 {d.type === "QUOTE" && (
                   <button type="button" onClick={() => convertToInvoice(d.id)}>
                     Convertir en facture
+                  </button>
+                )}
+                {d.type === "INVOICE" && d.direction === "SALE" && d.client?.isBusiness && d.client?.peppolAddress && (
+                  <button type="button" onClick={() => sendPeppol(d.id)} disabled={Boolean(d.peppolSentAt)}>
+                    {d.peppolSentAt ? "Envoyé via Peppol" : "Envoyer via Peppol"}
                   </button>
                 )}
               </td>

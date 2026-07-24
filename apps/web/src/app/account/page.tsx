@@ -13,6 +13,11 @@ interface AccountRecord {
   brandColor?: string;
   iban?: string;
   bic?: string;
+  street?: string;
+  postalCode?: string;
+  city?: string;
+  country: string;
+  peppolCompanyId?: string;
 }
 
 export default function AccountPage() {
@@ -21,6 +26,7 @@ export default function AccountPage() {
   const [account, setAccount] = useState<AccountRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [peppolStatus, setPeppolStatus] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch<AccountRecord>("/account")
@@ -44,6 +50,25 @@ export default function AccountPage() {
       });
       setAccount(updated);
       setSaved(true);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
+  async function registerWithRecommand() {
+    setError(null);
+    setPeppolStatus(null);
+    try {
+      const result = await apiFetch<{ account: AccountRecord; verificationUrl?: string }>(
+        "/account/peppol/register-company",
+        { method: "POST" }
+      );
+      setAccount(result.account);
+      setPeppolStatus(
+        result.verificationUrl
+          ? `Entreprise enregistrée. Vérification d'identité à compléter : ${result.verificationUrl}`
+          : "Entreprise enregistrée chez Recommand."
+      );
     } catch (err) {
       setError((err as Error).message);
     }
@@ -86,6 +111,25 @@ export default function AccountPage() {
             />
           </label>
 
+          <h2>Adresse</h2>
+          <p>Nécessaire pour Peppol et pour l'entête de vos factures.</p>
+          <label>
+            Rue et numéro
+            <input value={account.street ?? ""} onChange={(e) => update("street", e.target.value)} />
+          </label>
+          <label>
+            Code postal
+            <input value={account.postalCode ?? ""} onChange={(e) => update("postalCode", e.target.value)} />
+          </label>
+          <label>
+            Ville
+            <input value={account.city ?? ""} onChange={(e) => update("city", e.target.value)} />
+          </label>
+          <label>
+            Pays (code ISO)
+            <input value={account.country} onChange={(e) => update("country", e.target.value)} />
+          </label>
+
           <h2>Paiement (QR EPC)</h2>
           <p>Nécessaire pour afficher le QR de paiement sur vos factures.</p>
           <label>
@@ -100,6 +144,23 @@ export default function AccountPage() {
           <button type="submit">Enregistrer</button>
           {saved && <span> Enregistré.</span>}
         </form>
+      )}
+
+      {account && (
+        <section>
+          <h2>Peppol (facturation B2B)</h2>
+          {account.peppolCompanyId ? (
+            <p>Entreprise enregistrée chez Recommand (id : {account.peppolCompanyId}).</p>
+          ) : (
+            <>
+              <p>Enregistre ton entreprise chez Recommand pour pouvoir envoyer des factures via Peppol.</p>
+              <button type="button" onClick={registerWithRecommand}>
+                Enregistrer chez Recommand
+              </button>
+            </>
+          )}
+          {peppolStatus && <p>{peppolStatus}</p>}
+        </section>
       )}
     </main>
   );

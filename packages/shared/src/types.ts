@@ -20,6 +20,11 @@ export interface Account {
   brandColor?: string;
   iban?: string;
   bic?: string;
+  street?: string;
+  postalCode?: string;
+  city?: string;
+  country: string;
+  peppolCompanyId?: string;
   createdAt: string;
 }
 
@@ -39,7 +44,11 @@ export interface Client {
   vatNumber?: string;
   email?: string;
   address?: string;
+  postalCode?: string;
+  city?: string;
+  country: string;
   isBusiness: boolean;
+  peppolAddress?: string;
 }
 
 /** Regroupement de devis/factures par chantier ou projet. */

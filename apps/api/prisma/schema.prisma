@@ -51,6 +51,12 @@ model Account {
   brandColor   String?
   iban         String?
   bic          String?
+  street       String?
+  postalCode   String?
+  city         String?
+  country      String    @default("BE")
+  /// Id de l'entreprise enregistrée chez Recommand (Access Point Peppol) — voir POST /account/peppol/register-company.
+  peppolCompanyId String?
   createdAt    DateTime  @default(now())
 
   users        User[]
@@ -81,7 +87,12 @@ model Client {
   vatNumber  String?
   email      String?
   address    String?
+  postalCode String?
+  city       String?
+  country    String   @default("BE")
   isBusiness Boolean  @default(false)
+  /// Adresse Peppol du destinataire (ex. "0208:0123456789") — requise pour l'envoi B2B via Peppol.
+  peppolAddress String?
 
   projects   Project[]
   documents  BillingDocument[]
