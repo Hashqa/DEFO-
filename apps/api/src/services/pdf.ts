@@ -1,12 +1,6 @@
 import PDFDocument from "pdfkit";
-import type { Account, BillingDocument, Client, DocumentLine } from "@prisma/client";
 import { buildEpcQrPayload, generateEpcQrPng } from "./epcQr";
-
-type FullDocument = BillingDocument & {
-  lines: DocumentLine[];
-  client: Client;
-  account: Account;
-};
+import type { FullDocument } from "./documents";
 
 const DOCUMENT_TITLES: Record<FullDocument["type"], string> = {
   QUOTE: "Devis",

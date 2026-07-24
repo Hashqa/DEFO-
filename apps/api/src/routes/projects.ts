@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db";
 import { requireAuth } from "../middleware/auth";
+import { findOwnedClient } from "../services/ownership";
 
 export const projectsRouter = Router();
 projectsRouter.use(requireAuth);
@@ -21,7 +22,7 @@ projectsRouter.post("/", async (req, res) => {
     res.status(400).json({ error: "name et clientId sont requis" });
     return;
   }
-  const client = await prisma.client.findFirst({ where: { id: clientId, accountId } });
+  const client = await findOwnedClient(accountId, clientId);
   if (!client) {
     res.status(404).json({ error: "Client introuvable" });
     return;

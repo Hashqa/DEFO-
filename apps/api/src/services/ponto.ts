@@ -90,13 +90,3 @@ export async function listTransactions(accountId: string, maxPages = 5): Promise
   }
   return transactions;
 }
-
-/** Déclenche une resynchronisation des transactions d'un compte auprès de la banque. */
-export async function triggerSynchronization(accountId: string): Promise<void> {
-  await pontoFetch("/synchronizations", {
-    method: "POST",
-    body: JSON.stringify({
-      data: { type: "synchronization", attributes: { resourceType: "account", resourceId: accountId, subtype: "transactionDetails" } },
-    }),
-  });
-}

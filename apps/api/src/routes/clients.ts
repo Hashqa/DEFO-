@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db";
 import { requireAuth } from "../middleware/auth";
+import { findOwnedClient } from "../services/ownership";
 import { verifyRecipient } from "../services/peppol";
 
 export const clientsRouter = Router();
@@ -14,9 +15,7 @@ clientsRouter.get("/", async (req, res) => {
 
 clientsRouter.get("/:id", async (req, res) => {
   const accountId = req.accountId!;
-  const client = await prisma.client.findFirst({
-    where: { id: req.params.id, accountId },
-  });
+  const client = await findOwnedClient(accountId, req.params.id);
   if (!client) {
     res.status(404).json({ error: "Client introuvable" });
     return;
@@ -50,7 +49,7 @@ clientsRouter.post("/", async (req, res) => {
 
 clientsRouter.patch("/:id", async (req, res) => {
   const accountId = req.accountId!;
-  const existing = await prisma.client.findFirst({ where: { id: req.params.id, accountId } });
+  const existing = await findOwnedClient(accountId, req.params.id);
   if (!existing) {
     res.status(404).json({ error: "Client introuvable" });
     return;
@@ -66,7 +65,7 @@ clientsRouter.patch("/:id", async (req, res) => {
 /** Vérifie que l'adresse Peppol du client est joignable avant d'envoyer une facture. */
 clientsRouter.post("/:id/verify-peppol", async (req, res) => {
   const accountId = req.accountId!;
-  const client = await prisma.client.findFirst({ where: { id: req.params.id, accountId } });
+  const client = await findOwnedClient(accountId, req.params.id);
   if (!client) {
     res.status(404).json({ error: "Client introuvable" });
     return;

@@ -7,7 +7,7 @@ const mockPrisma = vi.hoisted(() => ({
     update: vi.fn(),
   },
   payment: {
-    findUnique: vi.fn(),
+    findMany: vi.fn(),
     create: vi.fn(),
   },
   $transaction: vi.fn(),
@@ -43,7 +43,7 @@ describe("reconcilePayments", () => {
     mockPrisma.billingDocument.findMany.mockResolvedValue([
       { id: "doc1", sequenceNumber: "INV-2026-0001", totalInclVat: 121 },
     ]);
-    mockPrisma.payment.findUnique.mockResolvedValue(null);
+    mockPrisma.payment.findMany.mockResolvedValue([]);
 
     const result = await reconcilePayments("acc1");
 
@@ -67,7 +67,7 @@ describe("reconcilePayments", () => {
     mockPrisma.billingDocument.findMany.mockResolvedValue([
       { id: "doc1", sequenceNumber: "INV-2026-0001", totalInclVat: 121 },
     ]);
-    mockPrisma.payment.findUnique.mockResolvedValue(null);
+    mockPrisma.payment.findMany.mockResolvedValue([]);
 
     const result = await reconcilePayments("acc1");
 
@@ -84,7 +84,7 @@ describe("reconcilePayments", () => {
       { id: "doc1", sequenceNumber: "INV-2026-0001", totalInclVat: 121 },
     ]);
     // Un Payment existe déjà pour cette transaction (déjà rapprochée lors d'un run précédent).
-    mockPrisma.payment.findUnique.mockResolvedValue({ id: "payment-existant" });
+    mockPrisma.payment.findMany.mockResolvedValue([{ externalTransactionId: "txn1" }]);
 
     const result = await reconcilePayments("acc1");
 
@@ -100,7 +100,7 @@ describe("reconcilePayments", () => {
     mockPrisma.billingDocument.findMany.mockResolvedValue([
       { id: "doc1", sequenceNumber: "INV-2026-0001", totalInclVat: 121 },
     ]);
-    mockPrisma.payment.findUnique.mockResolvedValue(null);
+    mockPrisma.payment.findMany.mockResolvedValue([]);
 
     const result = await reconcilePayments("acc1");
     expect(result.matchedCount).toBe(0);

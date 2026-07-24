@@ -1,4 +1,4 @@
-import type { Account, BillingDocument, Client, DocumentLine } from "@prisma/client";
+import type { FullDocument } from "./documents";
 
 const BASE_URL = process.env.RECOMMAND_BASE_URL ?? "https://app.recommand.eu/api/v1";
 
@@ -62,10 +62,6 @@ export async function createCompany(input: CreateCompanyInput): Promise<CreateCo
   });
 }
 
-export async function listCompanies(): Promise<{ success: boolean; companies: RecommandCompany[] }> {
-  return recommandFetch("/companies");
-}
-
 export interface VerifyRecipientResult {
   success: boolean;
   isValid: boolean;
@@ -87,8 +83,6 @@ export interface SendInvoiceResult {
   sentOverPeppol: boolean;
   sentOverEmail: boolean;
 }
-
-type FullDocument = BillingDocument & { lines: DocumentLine[]; client: Client; account: Account };
 
 /** Construit le corps JSON attendu par POST /{companyId}/send à partir de nos données. */
 export function buildInvoicePayload(document: FullDocument) {

@@ -13,50 +13,50 @@ export interface ReconciliationResult {
  */
 export async function reconcilePayments(accountId: string): Promise<ReconciliationResult> {
   const pontoAccounts = await listAccounts();
-  const openInvoices = await prisma.billingDocument.findMany({
-    where: { accountId, type: "INVOICE", direction: "SALE", status: { notIn: ["PAID", "REFUSED"] } },
+  const [openInvoices, transactionsByAccount] = await Promise.all([
+    prisma.billingDocument.findMany({
+      where: { accountId, type: "INVOICE", direction: "SALE", status: { notIn: ["PAID", "REFUSED"] } },
+    }),
+    Promise.all(pontoAccounts.map((account) => listTransactions(account.id))),
+  ]);
+
+  const allTransactions = transactionsByAccount.flat();
+  const candidates = allTransactions.filter((transaction) => transaction.amount > 0);
+  const alreadyReconciled = await prisma.payment.findMany({
+    where: { externalTransactionId: { in: candidates.map((transaction) => transaction.id) } },
+    select: { externalTransactionId: true },
   });
+  const reconciledIds = new Set(alreadyReconciled.map((payment) => payment.externalTransactionId));
 
   let matchedCount = 0;
-  let transactionsScanned = 0;
 
-  for (const pontoAccount of pontoAccounts) {
-    const transactions = await listTransactions(pontoAccount.id);
-    transactionsScanned += transactions.length;
+  for (const transaction of candidates) {
+    if (reconciledIds.has(transaction.id)) continue;
 
-    for (const transaction of transactions) {
-      if (transaction.amount <= 0) continue;
+    const communication = `${transaction.remittanceInformation ?? ""} ${transaction.description ?? ""}`;
+    const invoice = openInvoices.find(
+      (doc) =>
+        communication.includes(doc.sequenceNumber) &&
+        Math.abs(Number(doc.totalInclVat) - transaction.amount) < 0.01
+    );
+    if (!invoice) continue;
 
-      const existingPayment = await prisma.payment.findUnique({
-        where: { externalTransactionId: transaction.id },
-      });
-      if (existingPayment) continue;
-
-      const communication = `${transaction.remittanceInformation ?? ""} ${transaction.description ?? ""}`;
-      const invoice = openInvoices.find(
-        (doc) =>
-          communication.includes(doc.sequenceNumber) &&
-          Math.abs(Number(doc.totalInclVat) - transaction.amount) < 0.01
-      );
-      if (!invoice) continue;
-
-      await prisma.$transaction([
-        prisma.payment.create({
-          data: {
-            accountId,
-            documentId: invoice.id,
-            amount: transaction.amount,
-            paidAt: new Date(transaction.valueDate),
-            source: "BANK_RECONCILIATION",
-            externalTransactionId: transaction.id,
-          },
-        }),
-        prisma.billingDocument.update({ where: { id: invoice.id }, data: { status: "PAID" } }),
-      ]);
-      matchedCount++;
-      openInvoices.splice(openInvoices.indexOf(invoice), 1);
-    }
+    await prisma.$transaction([
+      prisma.payment.create({
+        data: {
+          accountId,
+          documentId: invoice.id,
+          amount: transaction.amount,
+          paidAt: new Date(transaction.valueDate),
+          source: "BANK_RECONCILIATION",
+          externalTransactionId: transaction.id,
+        },
+      }),
+      prisma.billingDocument.update({ where: { id: invoice.id }, data: { status: "PAID" } }),
+    ]);
+    matchedCount++;
+    openInvoices.splice(openInvoices.indexOf(invoice), 1);
   }
 
-  return { matchedCount, transactionsScanned };
+  return { matchedCount, transactionsScanned: allTransactions.length };
 }

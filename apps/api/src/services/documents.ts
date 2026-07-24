@@ -1,13 +1,20 @@
 import { randomUUID } from "node:crypto";
 import type {
+  Account,
   BillingDocument,
   BillingKind,
+  Client,
   DocumentDirection,
+  DocumentLine,
   DocumentType,
 } from "@prisma/client";
 import { prisma } from "../db";
 import { nextSequenceNumber } from "./documentNumbering";
+import { findOwnedClient, findOwnedProject } from "./ownership";
 import { sendInvoice } from "./peppol";
+
+/** Devis/facture avec ses relations chargées — utilisé partout où on a besoin du document complet (PDF, Peppol). */
+export type FullDocument = BillingDocument & { lines: DocumentLine[]; client: Client; account: Account };
 
 export interface DocumentLineInput {
   description: string;
@@ -45,12 +52,12 @@ export async function createDocument(accountId: string, input: CreateDocumentInp
     throw new Error("Un devis/facture doit contenir au moins une ligne");
   }
 
-  const client = await prisma.client.findFirst({ where: { id: input.clientId, accountId } });
+  const client = await findOwnedClient(accountId, input.clientId);
   if (!client) {
     throw new Error("Client introuvable");
   }
   if (input.projectId) {
-    const project = await prisma.project.findFirst({ where: { id: input.projectId, accountId } });
+    const project = await findOwnedProject(accountId, input.projectId);
     if (!project) {
       throw new Error("Chantier/projet introuvable");
     }
@@ -111,9 +118,6 @@ async function assertConvertibleQuote(accountId: string, quoteId: string) {
   });
   if (!quote) {
     throw new Error("Devis introuvable");
-  }
-  if (quote.convertedFromQuoteId !== null) {
-    // convertedFromQuoteId is only set on invoices; guard kept for type-safety.
   }
   return quote;
 }

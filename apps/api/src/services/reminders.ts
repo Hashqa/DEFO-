@@ -25,35 +25,37 @@ export async function findDueReminders(accountId?: string) {
   });
 }
 
+async function sendReminder(sender: EmailSender, invoice: Awaited<ReturnType<typeof findDueReminders>>[number]) {
+  if (!invoice.client.email) return false;
+
+  await sender.send({
+    to: invoice.client.email,
+    subject: `Rappel de paiement — facture ${invoice.sequenceNumber}`,
+    body: [
+      `Bonjour ${invoice.client.name},`,
+      "",
+      `La facture ${invoice.sequenceNumber} d'un montant de ${Number(invoice.totalInclVat).toFixed(2)} €, émise par ${invoice.account.companyName}, est en retard de paiement.`,
+      "Merci de régulariser dans les meilleurs délais.",
+      "",
+      "Cordialement.",
+    ].join("\n"),
+  });
+
+  await prisma.billingDocument.update({
+    where: { id: invoice.id },
+    data: { status: "OVERDUE", lastReminderSentAt: new Date() },
+  });
+  return true;
+}
+
+/** Les factures sont indépendantes les unes des autres : les relances partent en parallèle plutôt qu'une par une. */
 export async function sendPaymentReminders(
   sender: EmailSender = getDefaultEmailSender(),
   accountId?: string
 ): Promise<{ sentCount: number; total: number }> {
   const invoices = await findDueReminders(accountId);
-  let sentCount = 0;
-
-  for (const invoice of invoices) {
-    if (!invoice.client.email) continue;
-
-    await sender.send({
-      to: invoice.client.email,
-      subject: `Rappel de paiement — facture ${invoice.sequenceNumber}`,
-      body: [
-        `Bonjour ${invoice.client.name},`,
-        "",
-        `La facture ${invoice.sequenceNumber} d'un montant de ${Number(invoice.totalInclVat).toFixed(2)} €, émise par ${invoice.account.companyName}, est en retard de paiement.`,
-        "Merci de régulariser dans les meilleurs délais.",
-        "",
-        "Cordialement.",
-      ].join("\n"),
-    });
-
-    await prisma.billingDocument.update({
-      where: { id: invoice.id },
-      data: { status: "OVERDUE", lastReminderSentAt: new Date() },
-    });
-    sentCount++;
-  }
+  const results = await Promise.allSettled(invoices.map((invoice) => sendReminder(sender, invoice)));
+  const sentCount = results.filter((result) => result.status === "fulfilled" && result.value).length;
 
   return { sentCount, total: invoices.length };
 }
