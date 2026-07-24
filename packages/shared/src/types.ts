@@ -25,6 +25,9 @@ export interface Account {
   city?: string;
   country: string;
   peppolCompanyId?: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  subscriptionStatus: "NONE" | "ACTIVE" | "PAST_DUE" | "CANCELED";
   createdAt: string;
 }
 

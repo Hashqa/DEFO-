@@ -35,7 +35,8 @@ export default function DashboardPage() {
     <main>
       <nav>
         <Link href="/documents">Devis &amp; factures</Link> · <Link href="/clients">Clients</Link> ·{" "}
-        <strong>Tableau de bord</strong> · <Link href="/account">Compte</Link>
+        <strong>Tableau de bord</strong> · <Link href="/account">Compte</Link> ·{" "}
+        <Link href="/billing">Abonnement</Link>
       </nav>
       <h1>Tableau de bord</h1>
       {error && <p role="alert">{error}</p>}

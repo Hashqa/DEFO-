@@ -41,6 +41,13 @@ enum PaymentSource {
   MANUAL
 }
 
+enum SubscriptionStatus {
+  NONE
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
 /// Un compte = un indépendant/entreprise, isolé des autres (multi-tenant).
 model Account {
   id           String    @id @default(cuid())
@@ -57,6 +64,11 @@ model Account {
   country      String    @default("BE")
   /// Id de l'entreprise enregistrée chez Recommand (Access Point Peppol) — voir POST /account/peppol/register-company.
   peppolCompanyId String?
+
+  stripeCustomerId     String?             @unique
+  stripeSubscriptionId String?             @unique
+  subscriptionStatus   SubscriptionStatus  @default(NONE)
+
   createdAt    DateTime  @default(now())
 
   users        User[]

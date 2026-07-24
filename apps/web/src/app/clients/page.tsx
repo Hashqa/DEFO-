@@ -79,7 +79,8 @@ export default function ClientsPage() {
     <main>
       <nav>
         <Link href="/documents">Devis &amp; factures</Link> · <strong>Clients</strong> ·{" "}
-        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link>
+        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link> ·{" "}
+        <Link href="/billing">Abonnement</Link>
       </nav>
       <h1>Clients</h1>
 

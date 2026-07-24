@@ -78,7 +78,8 @@ export default function AccountPage() {
     <main>
       <nav>
         <Link href="/documents">Devis &amp; factures</Link> · <Link href="/clients">Clients</Link> ·{" "}
-        <Link href="/dashboard">Tableau de bord</Link> · <strong>Compte</strong>
+        <Link href="/dashboard">Tableau de bord</Link> · <strong>Compte</strong> ·{" "}
+        <Link href="/billing">Abonnement</Link>
       </nav>
       <h1>Mon compte</h1>
       {error && <p role="alert">{error}</p>}

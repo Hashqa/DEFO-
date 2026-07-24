@@ -80,7 +80,8 @@ export default function DocumentsPage() {
     <main>
       <nav>
         <strong>Devis &amp; factures</strong> · <Link href="/clients">Clients</Link> ·{" "}
-        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link>
+        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link> ·{" "}
+        <Link href="/billing">Abonnement</Link>
       </nav>
       <h1>Devis &amp; factures</h1>
       <p>
