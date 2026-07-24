@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { IconAccount, IconBilling, IconClients, IconDashboard, IconInvoice, IconQuote } from "./icons";
 
 const LINKS = [
-  { href: "/documents", label: "Devis & factures" },
-  { href: "/clients", label: "Clients" },
-  { href: "/dashboard", label: "Tableau de bord" },
-  { href: "/account", label: "Compte" },
-  { href: "/billing", label: "Abonnement" },
+  { href: "/quotes", label: "Devis", Icon: IconQuote },
+  { href: "/invoices", label: "Factures", Icon: IconInvoice },
+  { href: "/clients", label: "Clients", Icon: IconClients },
+  { href: "/dashboard", label: "Tableau de bord", Icon: IconDashboard },
+  { href: "/account", label: "Compte", Icon: IconAccount },
+  { href: "/billing", label: "Abonnement", Icon: IconBilling },
 ] as const;
 
 interface NavBarProps {
@@ -14,13 +16,38 @@ interface NavBarProps {
 
 export function NavBar({ active }: NavBarProps) {
   return (
-    <nav>
-      {LINKS.map((link, i) => (
-        <span key={link.href}>
-          {i > 0 && " · "}
-          {link.href === active ? <strong>{link.label}</strong> : <Link href={link.href}>{link.label}</Link>}
-        </span>
-      ))}
-    </nav>
+    <>
+      <nav>
+        <span className="brand">DEFA</span>
+        <div className="nav-links">
+          {LINKS.map((link) =>
+            link.href === active ? (
+              <strong key={link.href}>{link.label}</strong>
+            ) : (
+              <Link key={link.href} href={link.href}>
+                {link.label}
+              </Link>
+            )
+          )}
+        </div>
+      </nav>
+
+      {/* Barre d'onglets en bas, visible uniquement sur petit écran (navigation tactile) */}
+      <div className="bottom-tabs">
+        {LINKS.map(({ href, label, Icon }) =>
+          href === active ? (
+            <span key={href} className="tab-active">
+              <Icon className="tab-icon" />
+              {label}
+            </span>
+          ) : (
+            <Link key={href} href={href}>
+              <Icon className="tab-icon" />
+              {label}
+            </Link>
+          )
+        )}
+      </div>
+    </>
   );
 }

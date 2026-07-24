@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, apiUpload } from "../../../lib/api";
 import { useRequireAuth } from "../../../lib/useRequireAuth";
 
@@ -30,12 +30,21 @@ interface LineInput {
 const EMPTY_LINE: LineInput = { description: "", quantity: "1", unitPrice: "0", vatRate: "21" };
 
 export default function NewDocumentPage() {
+  return (
+    <Suspense>
+      <NewDocumentForm />
+    </Suspense>
+  );
+}
+
+function NewDocumentForm() {
   useRequireAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [clients, setClients] = useState<ClientRecord[]>([]);
   const [clientId, setClientId] = useState("");
-  const [type, setType] = useState<"QUOTE" | "INVOICE">("QUOTE");
+  const [type, setType] = useState<"QUOTE" | "INVOICE">(searchParams.get("type") === "INVOICE" ? "INVOICE" : "QUOTE");
   const [direction, setDirection] = useState<"SALE" | "PURCHASE">("SALE");
   const [billingKind, setBillingKind] = useState<"SERVICE" | "MATERIAL_AND_LABOR">("SERVICE");
   const [lines, setLines] = useState<LineInput[]>([{ ...EMPTY_LINE }]);
@@ -107,7 +116,7 @@ export default function NewDocumentPage() {
           })),
         }),
       });
-      router.push("/documents");
+      router.push(type === "QUOTE" ? "/quotes" : "/invoices");
     } catch (err) {
       setError((err as Error).message);
     }
@@ -115,7 +124,7 @@ export default function NewDocumentPage() {
 
   return (
     <main>
-      <h1>Nouveau devis/facture</h1>
+      <h1>{type === "QUOTE" ? "Nouveau devis" : "Nouvelle facture"}</h1>
       <form onSubmit={handleSubmit}>
         <label>
           Client

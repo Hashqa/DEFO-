@@ -20,7 +20,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       setToken(result.token);
-      router.push("/documents");
+      router.push("/invoices");
     } catch (err) {
       setError((err as Error).message);
     }

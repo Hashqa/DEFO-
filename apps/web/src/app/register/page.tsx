@@ -24,7 +24,7 @@ export default function RegisterPage() {
         body: JSON.stringify({ companyName, vatNumber, bceNumber, fullName, email, password }),
       });
       setToken(result.token);
-      router.push("/documents");
+      router.push("/invoices");
     } catch (err) {
       setError((err as Error).message);
     }
