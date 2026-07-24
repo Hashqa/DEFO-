@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Card } from "../components/Card";
 import { apiFetch } from "../lib/api";
 import { cacheClients, getCachedClients, type CachedClient } from "../lib/db";
 import { isOnline } from "../lib/sync";
+import { useTheme } from "../theme";
 
-interface Props {
-  onBack: () => void;
-}
-
-export default function ClientsScreen({ onBack }: Props) {
+export default function ClientsScreen() {
+  const theme = useTheme();
   const [clients, setClients] = useState<CachedClient[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,20 +30,20 @@ export default function ClientsScreen({ onBack }: Props) {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Button title="← Retour" onPress={onBack} />
-      <Text style={styles.title}>Clients</Text>
-      {error && <Text style={styles.error}>{error} (cache local affiché)</Text>}
+    <View style={[styles.container, { backgroundColor: theme.pageBg }]}>
+      <Text style={[styles.title, { color: theme.text }]}>Clients</Text>
+      {error && <Text style={{ color: theme.danger, marginBottom: 8 }}>{error} (cache local affiché)</Text>}
       <FlatList
         data={clients}
         keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text>{item.name}</Text>
-            {item.vatNumber && <Text style={styles.muted}>TVA {item.vatNumber}</Text>}
-          </View>
+          <Card style={{ gap: 2 }}>
+            <Text style={{ color: theme.text, fontWeight: "600" }}>{item.name}</Text>
+            {item.vatNumber && <Text style={{ color: theme.muted, fontSize: 12 }}>TVA {item.vatNumber}</Text>}
+          </Card>
         )}
-        ListEmptyComponent={<Text style={styles.muted}>Aucun client en cache.</Text>}
+        ListEmptyComponent={<Text style={{ color: theme.muted }}>Aucun client en cache.</Text>}
       />
     </View>
   );
@@ -52,8 +51,5 @@ export default function ClientsScreen({ onBack }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  title: { fontSize: 22, fontWeight: "bold", marginVertical: 12 },
-  error: { color: "orange", marginBottom: 8 },
-  row: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  muted: { color: "#666", fontSize: 12 },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 12 },
 });

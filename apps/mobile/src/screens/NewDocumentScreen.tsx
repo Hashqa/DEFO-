@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { Button, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { AppButton } from "../components/AppButton";
+import { Card } from "../components/Card";
 import { apiFetch } from "../lib/api";
 import { getCachedClients, saveDocumentLocal, type CachedClient } from "../lib/db";
 import { isOnline } from "../lib/sync";
+import { useTheme } from "../theme";
 
 interface Props {
+  initialType: "QUOTE" | "INVOICE";
   onDone: () => void;
 }
 
@@ -25,10 +29,11 @@ function generateLocalId(): string {
  * Formulaire simplifié pour mobile : vente/service par défaut (le cas le
  * plus courant en déplacement). Le web couvre les cas achat/matière+MO.
  */
-export default function NewDocumentScreen({ onDone }: Props) {
+export default function NewDocumentScreen({ initialType, onDone }: Props) {
+  const theme = useTheme();
   const [clients, setClients] = useState<CachedClient[]>([]);
   const [clientId, setClientId] = useState<string | null>(null);
-  const [type, setType] = useState<"QUOTE" | "INVOICE">("QUOTE");
+  const [type, setType] = useState<"QUOTE" | "INVOICE">(initialType);
   const [lines, setLines] = useState<LineInput[]>([{ ...EMPTY_LINE }]);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,69 +86,82 @@ export default function NewDocumentScreen({ onDone }: Props) {
     onDone();
   }
 
+  function optionStyle(selected: boolean) {
+    return [
+      styles.option,
+      { borderColor: selected ? theme.accent : theme.border, backgroundColor: selected ? theme.accentSoft : theme.cardBg },
+    ];
+  }
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Nouveau devis/facture</Text>
+    <ScrollView style={[styles.container, { backgroundColor: theme.pageBg }]}>
+      <Text style={[styles.title, { color: theme.text }]}>
+        {type === "QUOTE" ? "Nouveau devis" : "Nouvelle facture"}
+      </Text>
 
-      <Text style={styles.label}>Client</Text>
-      {clients.map((c) => (
-        <Pressable
-          key={c.id}
-          onPress={() => setClientId(c.id)}
-          style={[styles.option, clientId === c.id && styles.optionSelected]}
-        >
-          <Text>{c.name}</Text>
-        </Pressable>
-      ))}
-      {clients.length === 0 && (
-        <Text style={styles.muted}>Aucun client en cache — connectez-vous au réseau au moins une fois.</Text>
-      )}
-
-      <Text style={styles.label}>Type</Text>
-      <View style={styles.row}>
-        <Pressable onPress={() => setType("QUOTE")} style={[styles.option, type === "QUOTE" && styles.optionSelected]}>
-          <Text>Devis</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setType("INVOICE")}
-          style={[styles.option, type === "INVOICE" && styles.optionSelected]}
-        >
-          <Text>Facture</Text>
-        </Pressable>
-      </View>
-
-      <Text style={styles.label}>Lignes</Text>
-      {lines.map((line, i) => (
-        <View key={i} style={styles.lineBlock}>
-          <TextInput
-            style={styles.input}
-            placeholder="Description"
-            value={line.description}
-            onChangeText={(v) => updateLine(i, "description", v)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Qté"
-            keyboardType="numeric"
-            value={line.quantity}
-            onChangeText={(v) => updateLine(i, "quantity", v)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="PU HT"
-            keyboardType="numeric"
-            value={line.unitPrice}
-            onChangeText={(v) => updateLine(i, "unitPrice", v)}
-          />
+      <Card style={{ gap: 16 }}>
+        <View>
+          <Text style={[styles.label, { color: theme.muted }]}>Type</Text>
+          <View style={styles.row}>
+            <Pressable onPress={() => setType("QUOTE")} style={optionStyle(type === "QUOTE")}>
+              <Text style={{ color: theme.text }}>Devis</Text>
+            </Pressable>
+            <Pressable onPress={() => setType("INVOICE")} style={optionStyle(type === "INVOICE")}>
+              <Text style={{ color: theme.text }}>Facture</Text>
+            </Pressable>
+          </View>
         </View>
-      ))}
-      <Button title="+ Ligne" onPress={addLine} />
 
-      {error && <Text style={styles.error}>{error}</Text>}
-      <View style={styles.actions}>
-        <Button title="Créer" onPress={handleSubmit} />
-        <Button title="Annuler" onPress={onDone} color="#999" />
-      </View>
+        <View>
+          <Text style={[styles.label, { color: theme.muted }]}>Client</Text>
+          {clients.map((c) => (
+            <Pressable key={c.id} onPress={() => setClientId(c.id)} style={[optionStyle(clientId === c.id), { marginBottom: 6 }]}>
+              <Text style={{ color: theme.text }}>{c.name}</Text>
+            </Pressable>
+          ))}
+          {clients.length === 0 && (
+            <Text style={{ color: theme.muted }}>Aucun client en cache — connectez-vous au réseau au moins une fois.</Text>
+          )}
+        </View>
+
+        <View>
+          <Text style={[styles.label, { color: theme.muted }]}>Lignes</Text>
+          {lines.map((line, i) => (
+            <View key={i} style={[styles.lineBlock, { borderBottomColor: theme.borderLight }]}>
+              <TextInput
+                style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+                placeholder="Description"
+                placeholderTextColor={theme.muted}
+                value={line.description}
+                onChangeText={(v) => updateLine(i, "description", v)}
+              />
+              <TextInput
+                style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+                placeholder="Qté"
+                placeholderTextColor={theme.muted}
+                keyboardType="numeric"
+                value={line.quantity}
+                onChangeText={(v) => updateLine(i, "quantity", v)}
+              />
+              <TextInput
+                style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+                placeholder="PU HT"
+                placeholderTextColor={theme.muted}
+                keyboardType="numeric"
+                value={line.unitPrice}
+                onChangeText={(v) => updateLine(i, "unitPrice", v)}
+              />
+            </View>
+          ))}
+          <AppButton title="+ Ligne" onPress={addLine} variant="soft" />
+        </View>
+
+        {error && <Text style={{ color: theme.danger }}>{error}</Text>}
+        <View style={styles.actions}>
+          <AppButton title="Créer" onPress={handleSubmit} />
+          <AppButton title="Annuler" onPress={onDone} variant="soft" />
+        </View>
+      </Card>
     </ScrollView>
   );
 }
@@ -151,13 +169,10 @@ export default function NewDocumentScreen({ onDone }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 12 },
-  label: { fontWeight: "600", marginTop: 12, marginBottom: 4 },
-  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 8, marginBottom: 8 },
+  label: { fontWeight: "600", marginBottom: 6, fontSize: 13 },
+  input: { borderWidth: 1, borderRadius: 10, padding: 9, marginBottom: 8 },
   row: { flexDirection: "row", gap: 8 },
-  option: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 8, marginBottom: 6 },
-  optionSelected: { borderColor: "#333", backgroundColor: "#eee" },
-  lineBlock: { marginBottom: 8, borderBottomWidth: 1, borderBottomColor: "#eee", paddingBottom: 8 },
-  error: { color: "red", marginVertical: 8 },
-  muted: { color: "#666" },
-  actions: { marginTop: 16, gap: 8 },
+  option: { borderWidth: 1, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 },
+  lineBlock: { marginBottom: 8, borderBottomWidth: 1, paddingBottom: 8 },
+  actions: { gap: 8 },
 });
