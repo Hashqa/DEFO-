@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { NavBar } from "../../components/NavBar";
 import { apiFetch, fetchDocumentPdfUrl } from "../../lib/api";
 import { useRequireAuth } from "../../lib/useRequireAuth";
 
@@ -28,16 +29,22 @@ export default function DocumentsPage() {
       .catch((err) => setError((err as Error).message));
   }, []);
 
-  async function convertToInvoice(id: string) {
+  /** Les actions ci-dessous partagent toutes la forme "appeler l'API, puis recharger la liste, en gérant l'erreur". */
+  async function runAction<T>(action: () => Promise<T>, onSuccess?: (result: T) => void) {
     setError(null);
     try {
-      await apiFetch(`/documents/${id}/convert`, { method: "POST" });
+      const result = await action();
+      onSuccess?.(result);
       const data = await apiFetch<DocumentRecord[]>("/documents");
       setDocuments(data);
     } catch (err) {
       setError((err as Error).message);
     }
   }
+
+  const convertToInvoice = (id: string) => runAction(() => apiFetch(`/documents/${id}/convert`, { method: "POST" }));
+
+  const sendPeppol = (id: string) => runAction(() => apiFetch(`/documents/${id}/send-peppol`, { method: "POST" }));
 
   async function viewPdf(id: string) {
     try {
@@ -48,61 +55,35 @@ export default function DocumentsPage() {
     }
   }
 
-  async function sendPeppol(id: string) {
-    setError(null);
-    try {
-      await apiFetch(`/documents/${id}/send-peppol`, { method: "POST" });
-      const data = await apiFetch<DocumentRecord[]>("/documents");
-      setDocuments(data);
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  }
-
   const [reconcileResult, setReconcileResult] = useState<string | null>(null);
 
-  async function reconcilePayments() {
-    setError(null);
+  function reconcilePayments() {
     setReconcileResult(null);
-    try {
-      const result = await apiFetch<{ matchedCount: number; transactionsScanned: number }>(
-        "/documents/reconcile-payments",
-        { method: "POST" }
-      );
-      setReconcileResult(
-        `${result.matchedCount} facture(s) rapprochée(s) sur ${result.transactionsScanned} transaction(s) scannée(s).`
-      );
-      const data = await apiFetch<DocumentRecord[]>("/documents");
-      setDocuments(data);
-    } catch (err) {
-      setError((err as Error).message);
-    }
+    return runAction(
+      () =>
+        apiFetch<{ matchedCount: number; transactionsScanned: number }>("/documents/reconcile-payments", {
+          method: "POST",
+        }),
+      (result) =>
+        setReconcileResult(
+          `${result.matchedCount} facture(s) rapprochée(s) sur ${result.transactionsScanned} transaction(s) scannée(s).`
+        )
+    );
   }
 
   const [reminderResult, setReminderResult] = useState<string | null>(null);
 
-  async function runReminders() {
-    setError(null);
+  function runReminders() {
     setReminderResult(null);
-    try {
-      const result = await apiFetch<{ sentCount: number; total: number }>("/documents/reminders/run", {
-        method: "POST",
-      });
-      setReminderResult(`${result.sentCount}/${result.total} relance(s) envoyée(s).`);
-      const data = await apiFetch<DocumentRecord[]>("/documents");
-      setDocuments(data);
-    } catch (err) {
-      setError((err as Error).message);
-    }
+    return runAction(
+      () => apiFetch<{ sentCount: number; total: number }>("/documents/reminders/run", { method: "POST" }),
+      (result) => setReminderResult(`${result.sentCount}/${result.total} relance(s) envoyée(s).`)
+    );
   }
 
   return (
     <main>
-      <nav>
-        <strong>Devis &amp; factures</strong> · <Link href="/clients">Clients</Link> ·{" "}
-        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link> ·{" "}
-        <Link href="/billing">Abonnement</Link>
-      </nav>
+      <NavBar active="/documents" />
       <h1>Devis &amp; factures</h1>
       <p>
         <Link href="/documents/new">+ Nouveau devis/facture</Link>{" "}

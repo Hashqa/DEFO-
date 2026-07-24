@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { NavBar } from "../../components/NavBar";
 import { apiFetch } from "../../lib/api";
 import { useRequireAuth } from "../../lib/useRequireAuth";
 
@@ -50,11 +50,7 @@ export default function BillingPage() {
 
   return (
     <main>
-      <nav>
-        <Link href="/documents">Devis &amp; factures</Link> · <Link href="/clients">Clients</Link> ·{" "}
-        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link> ·{" "}
-        <strong>Abonnement</strong>
-      </nav>
+      <NavBar active="/billing" />
       <h1>Abonnement</h1>
 
       {checkoutResult === "success" && <p>Paiement effectué — l'abonnement sera actif sous peu.</p>}

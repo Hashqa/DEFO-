@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { apiFetch } from "../../lib/api";
+import { NavBar } from "../../components/NavBar";
+import { useApiResource } from "../../lib/useApiResource";
 import { useRequireAuth } from "../../lib/useRequireAuth";
 
 interface TopClient {
@@ -22,22 +21,11 @@ interface AccountStats {
 export default function DashboardPage() {
   useRequireAuth();
 
-  const [stats, setStats] = useState<AccountStats | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    apiFetch<AccountStats>("/stats")
-      .then(setStats)
-      .catch((err) => setError((err as Error).message));
-  }, []);
+  const { data: stats, error } = useApiResource<AccountStats>("/stats");
 
   return (
     <main>
-      <nav>
-        <Link href="/documents">Devis &amp; factures</Link> · <Link href="/clients">Clients</Link> ·{" "}
-        <strong>Tableau de bord</strong> · <Link href="/account">Compte</Link> ·{" "}
-        <Link href="/billing">Abonnement</Link>
-      </nav>
+      <NavBar active="/dashboard" />
       <h1>Tableau de bord</h1>
       {error && <p role="alert">{error}</p>}
       {!stats && !error && <p>Chargement…</p>}

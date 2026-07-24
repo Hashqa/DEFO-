@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import Link from "next/link";
+import { NavBar } from "../../components/NavBar";
 import { apiFetch } from "../../lib/api";
 import { useRequireAuth } from "../../lib/useRequireAuth";
 
@@ -77,11 +77,7 @@ export default function ClientsPage() {
 
   return (
     <main>
-      <nav>
-        <Link href="/documents">Devis &amp; factures</Link> · <strong>Clients</strong> ·{" "}
-        <Link href="/dashboard">Tableau de bord</Link> · <Link href="/account">Compte</Link> ·{" "}
-        <Link href="/billing">Abonnement</Link>
-      </nav>
+      <NavBar active="/clients" />
       <h1>Clients</h1>
 
       <form onSubmit={handleSubmit}>
