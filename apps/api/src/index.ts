@@ -32,7 +32,8 @@ app.post("/billing/webhook", express.raw({ type: "application/json" }), async (r
   }
 });
 
-app.use(express.json());
+// Limite relevée pour accepter le logo encodé en data URL (base64) dans PATCH /account.
+app.use(express.json({ limit: "1mb" }));
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });

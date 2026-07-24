@@ -13,6 +13,28 @@ const DOCUMENT_TITLES: Record<FullDocument["type"], string> = {
   INVOICE: "Facture",
 };
 
+const DEFAULT_ACCENT_COLOR = "#111111";
+
+/**
+ * Décode un logo stocké en data URL (base64). On ne va jamais chercher une
+ * URL externe côté serveur pour éviter le SSRF (le champ logoUrl est saisi
+ * librement par le titulaire du compte) — seul le format data: est accepté.
+ */
+function decodeLogoDataUrl(logoUrl: string | null): Buffer | null {
+  if (!logoUrl) return null;
+  const match = /^data:image\/(png|jpe?g);base64,(.+)$/i.exec(logoUrl);
+  if (!match) return null;
+  try {
+    return Buffer.from(match[2], "base64");
+  } catch {
+    return null;
+  }
+}
+
+function isValidHexColor(color: string | null): color is string {
+  return Boolean(color && /^#[0-9a-f]{6}$/i.test(color));
+}
+
 /**
  * Génère le PDF légal d'un devis/facture : mentions obligatoires belges
  * (n° BCE, TVA, numérotation séquentielle, détail des taux de TVA) — voir
@@ -21,6 +43,9 @@ const DOCUMENT_TITLES: Record<FullDocument["type"], string> = {
  * paiement EPC (section 3.4) si le compte a renseigné son IBAN.
  */
 export async function generateDocumentPdf(document: FullDocument): Promise<Buffer> {
+  const accentColor = isValidHexColor(document.account.brandColor) ? document.account.brandColor : DEFAULT_ACCENT_COLOR;
+  const logo = decodeLogoDataUrl(document.account.logoUrl);
+
   let paymentQrPng: Buffer | null = null;
   if (document.type === "INVOICE" && document.account.iban) {
     const payload = buildEpcQrPayload({
@@ -42,13 +67,22 @@ export async function generateDocumentPdf(document: FullDocument): Promise<Buffe
 
     const title = DOCUMENT_TITLES[document.type];
 
-    doc.fontSize(20).text(document.account.companyName, { continued: false });
-    doc.fontSize(9)
+    if (logo) {
+      try {
+        doc.image(logo, 50, 45, { fit: [120, 50] });
+        doc.moveDown(3.5);
+      } catch {
+        // Logo corrompu/format non supporté (pdfkit ne lit que JPEG/PNG) : on continue sans, tant pis pour l'esthétique.
+      }
+    }
+
+    doc.fillColor(accentColor).fontSize(20).text(document.account.companyName, { continued: false });
+    doc.fillColor("black").fontSize(9)
       .text(`TVA ${document.account.vatNumber} — BCE ${document.account.bceNumber}`)
       .moveDown(1.5);
 
-    doc.fontSize(16).text(`${title} ${document.sequenceNumber}`);
-    doc.fontSize(10)
+    doc.fillColor(accentColor).fontSize(16).text(`${title} ${document.sequenceNumber}`);
+    doc.fillColor("black").fontSize(10)
       .text(`Date d'émission : ${document.issuedAt.toLocaleDateString("fr-BE")}`)
       .text(document.dueAt ? `Échéance : ${document.dueAt.toLocaleDateString("fr-BE")}` : "")
       .moveDown(1);
@@ -61,13 +95,13 @@ export async function generateDocumentPdf(document: FullDocument): Promise<Buffe
 
     const tableTop = doc.y;
     const columns = { description: 50, quantity: 280, unitPrice: 350, vatRate: 430, total: 480 };
-    doc.fontSize(10).font("Helvetica-Bold");
+    doc.fontSize(10).font("Helvetica-Bold").fillColor(accentColor);
     doc.text("Description", columns.description, tableTop);
     doc.text("Qté", columns.quantity, tableTop);
     doc.text("PU HT", columns.unitPrice, tableTop);
     doc.text("TVA", columns.vatRate, tableTop);
     doc.text("Total HT", columns.total, tableTop);
-    doc.font("Helvetica").moveDown(0.5);
+    doc.font("Helvetica").fillColor("black").moveDown(0.5);
 
     for (const line of document.lines) {
       const y = doc.y;

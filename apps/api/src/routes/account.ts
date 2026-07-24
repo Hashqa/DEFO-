@@ -15,6 +15,16 @@ accountRouter.get("/", async (req, res) => {
 accountRouter.patch("/", requireOwner, async (req, res) => {
   const { companyName, vatNumber, bceNumber, logoUrl, brandColor, iban, bic, street, postalCode, city, country } =
     req.body;
+  if (logoUrl && typeof logoUrl === "string") {
+    if (!/^data:image\/(png|jpe?g);base64,/.test(logoUrl)) {
+      res.status(400).json({ error: "Le logo doit être une image PNG ou JPEG (envoyée en data URL)" });
+      return;
+    }
+    if (logoUrl.length > 700_000) {
+      res.status(400).json({ error: "Le logo est trop volumineux (max ~500 Ko)" });
+      return;
+    }
+  }
   const account = await prisma.account.update({
     where: { id: req.accountId! },
     data: { companyName, vatNumber, bceNumber, logoUrl, brandColor, iban, bic, street, postalCode, city, country },

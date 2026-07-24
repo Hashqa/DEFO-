@@ -66,9 +66,10 @@ export default function BillingPage() {
       {status && (
         <>
           <p>Statut : {STATUS_LABELS[status.subscriptionStatus]}</p>
+          <p>Tarif : 9,90 €/mois par utilisateur (ajusté automatiquement selon les utilisateurs invités).</p>
           {status.subscriptionStatus !== "ACTIVE" && (
             <button type="button" onClick={startCheckout} disabled={loading}>
-              {loading ? "Redirection…" : "S'abonner (9,90 €/mois)"}
+              {loading ? "Redirection…" : "S'abonner"}
             </button>
           )}
         </>

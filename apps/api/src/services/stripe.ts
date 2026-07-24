@@ -10,6 +10,7 @@ export async function createCheckoutSession(accountId: string, email: string) {
     throw new Error("STRIPE_PRICE_ID non configuré");
   }
   const account = await prisma.account.findUniqueOrThrow({ where: { id: accountId } });
+  const seats = await prisma.user.count({ where: { accountId } });
 
   let customerId = account.stripeCustomerId ?? undefined;
   if (!customerId) {
@@ -22,10 +23,30 @@ export async function createCheckoutSession(accountId: string, email: string) {
   return stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
-    line_items: [{ price: priceId, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: seats }],
     success_url: `${appUrl}/billing?success=1`,
     cancel_url: `${appUrl}/billing?canceled=1`,
     metadata: { accountId },
+  });
+}
+
+/**
+ * Ajuste la quantité de l'abonnement Stripe sur le nombre d'utilisateurs
+ * actuel du compte (tarif par utilisateur — section 4). Sans effet si le
+ * compte n'a pas encore d'abonnement actif.
+ */
+export async function updateSubscriptionQuantity(accountId: string): Promise<void> {
+  const account = await prisma.account.findUniqueOrThrow({ where: { id: accountId } });
+  if (!account.stripeSubscriptionId) return;
+
+  const seats = await prisma.user.count({ where: { accountId } });
+  const subscription = await stripe.subscriptions.retrieve(account.stripeSubscriptionId);
+  const item = subscription.items.data[0];
+  if (!item) return;
+
+  await stripe.subscriptionItems.update(item.id, {
+    quantity: seats,
+    proration_behavior: "create_prorations",
   });
 }
 

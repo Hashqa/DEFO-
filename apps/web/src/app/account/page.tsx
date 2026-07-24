@@ -100,9 +100,27 @@ export default function AccountPage() {
             <input value={account.bceNumber} onChange={(e) => update("bceNumber", e.target.value)} required />
           </label>
           <label>
-            Logo (URL)
-            <input value={account.logoUrl ?? ""} onChange={(e) => update("logoUrl", e.target.value)} />
+            Logo (image, max 500 Ko)
+            <input
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                if (file.size > 500 * 1024) {
+                  setError("Le logo doit faire moins de 500 Ko");
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => update("logoUrl", reader.result as string);
+                reader.readAsDataURL(file);
+              }}
+            />
           </label>
+          {account.logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={account.logoUrl} alt="Logo de l'entreprise" style={{ maxHeight: 60, display: "block" }} />
+          )}
           <label>
             Couleur de marque
             <input
