@@ -1,5 +1,5 @@
 import { prisma } from "../db";
-import { ConsoleEmailSender, type EmailSender } from "./email";
+import { getDefaultEmailSender, type EmailSender } from "./email";
 
 const REMINDER_AFTER_DAYS = Number(process.env.REMINDER_AFTER_DAYS ?? 7);
 const REMINDER_INTERVAL_DAYS = Number(process.env.REMINDER_INTERVAL_DAYS ?? 7);
@@ -26,7 +26,7 @@ export async function findDueReminders(accountId?: string) {
 }
 
 export async function sendPaymentReminders(
-  sender: EmailSender = new ConsoleEmailSender(),
+  sender: EmailSender = getDefaultEmailSender(),
   accountId?: string
 ): Promise<{ sentCount: number; total: number }> {
   const invoices = await findDueReminders(accountId);

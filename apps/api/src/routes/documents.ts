@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import { requireAuth, requireOwner } from "../middleware/auth";
 import {
   convertQuoteByOwnerDecision,
@@ -11,6 +12,9 @@ import {
 import { generateDocumentPdf } from "../services/pdf";
 import { sendPaymentReminders } from "../services/reminders";
 import { reconcilePayments } from "../services/bankReconciliation";
+import { scanInvoice } from "../services/mindee";
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
 
 export const documentsRouter = Router();
 documentsRouter.use(requireAuth);
@@ -84,6 +88,20 @@ documentsRouter.post("/reconcile-payments", requireOwner, async (req, res) => {
   try {
     const result = await reconcilePayments(accountId);
     res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+/** Scan d'une facture fournisseur (section 3.2) : extraction via Mindee, à vérifier/compléter manuellement. */
+documentsRouter.post("/scan-invoice", upload.single("file"), async (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ error: "Fichier manquant (champ 'file')" });
+    return;
+  }
+  try {
+    const extracted = await scanInvoice(req.file.buffer, req.file.originalname);
+    res.json(extracted);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
   }

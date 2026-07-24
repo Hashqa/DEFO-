@@ -33,6 +33,23 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   return res.json();
 }
 
+/** Upload multipart (scan de facture) — pas de Content-Type manuel, le navigateur fixe la boundary. */
+export async function apiUpload<T>(path: string, file: File): Promise<T> {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? `Erreur ${res.status}`);
+  }
+  return res.json();
+}
+
 /** Récupère le PDF via fetch (l'endpoint exige un Bearer token, donc un lien direct ne fonctionne pas). */
 export async function fetchDocumentPdfUrl(documentId: string): Promise<string> {
   const token = getToken();

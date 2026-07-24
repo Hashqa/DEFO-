@@ -1,9 +1,19 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "../../../lib/api";
+import { apiFetch, apiUpload } from "../../../lib/api";
 import { useRequireAuth } from "../../../lib/useRequireAuth";
+
+interface ExtractedInvoice {
+  supplierName?: string;
+  invoiceNumber?: string;
+  invoiceDate?: string;
+  totalAmount?: number;
+  totalNet?: number;
+  totalTax?: number;
+  raw: Record<string, unknown>;
+}
 
 interface ClientRecord {
   id: string;
@@ -30,6 +40,35 @@ export default function NewDocumentPage() {
   const [billingKind, setBillingKind] = useState<"SERVICE" | "MATERIAL_AND_LABOR">("SERVICE");
   const [lines, setLines] = useState<LineInput[]>([{ ...EMPTY_LINE }]);
   const [error, setError] = useState<string | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const [extracted, setExtracted] = useState<ExtractedInvoice | null>(null);
+
+  async function handleScan(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setScanning(true);
+    try {
+      const result = await apiUpload<ExtractedInvoice>("/documents/scan-invoice", file);
+      setExtracted(result);
+      if (result.totalNet !== undefined) {
+        setLines([
+          {
+            description: result.supplierName
+              ? `Facture ${result.supplierName}${result.invoiceNumber ? ` (${result.invoiceNumber})` : ""}`
+              : "Facture fournisseur (scannée)",
+            quantity: "1",
+            unitPrice: String(result.totalNet),
+            vatRate: "21",
+          },
+        ]);
+      }
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setScanning(false);
+    }
+  }
 
   useEffect(() => {
     apiFetch<ClientRecord[]>("/clients")
@@ -116,6 +155,20 @@ export default function NewDocumentPage() {
             <option value="MATERIAL_AND_LABOR">Matière première + main d'œuvre</option>
           </select>
         </label>
+
+        {direction === "PURCHASE" && (
+          <div>
+            <h2>Scanner la facture (achats)</h2>
+            <input type="file" accept="image/*,.pdf" onChange={handleScan} disabled={scanning} />
+            {scanning && <p>Analyse en cours…</p>}
+            {extracted && (
+              <details>
+                <summary>Données extraites (à vérifier)</summary>
+                <pre>{JSON.stringify(extracted, null, 2)}</pre>
+              </details>
+            )}
+          </div>
+        )}
 
         <h2>Lignes</h2>
         {lines.map((line, i) => (
