@@ -10,6 +10,7 @@ import {
 } from "../services/documents";
 import { generateDocumentPdf } from "../services/pdf";
 import { sendPaymentReminders } from "../services/reminders";
+import { reconcilePayments } from "../services/bankReconciliation";
 
 export const documentsRouter = Router();
 documentsRouter.use(requireAuth);
@@ -75,6 +76,17 @@ documentsRouter.post("/reminders/run", requireOwner, async (req, res) => {
   const accountId = req.accountId!;
   const result = await sendPaymentReminders(undefined, accountId);
   res.json(result);
+});
+
+/** Rapproche les transactions bancaires Ponto avec les factures de vente en attente de paiement. */
+documentsRouter.post("/reconcile-payments", requireOwner, async (req, res) => {
+  const accountId = req.accountId!;
+  try {
+    const result = await reconcilePayments(accountId);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
 });
 
 /** Envoie une facture de vente via Peppol (Recommand). */

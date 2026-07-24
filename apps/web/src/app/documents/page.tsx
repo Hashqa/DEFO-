@@ -59,6 +59,26 @@ export default function DocumentsPage() {
     }
   }
 
+  const [reconcileResult, setReconcileResult] = useState<string | null>(null);
+
+  async function reconcilePayments() {
+    setError(null);
+    setReconcileResult(null);
+    try {
+      const result = await apiFetch<{ matchedCount: number; transactionsScanned: number }>(
+        "/documents/reconcile-payments",
+        { method: "POST" }
+      );
+      setReconcileResult(
+        `${result.matchedCount} facture(s) rapprochée(s) sur ${result.transactionsScanned} transaction(s) scannée(s).`
+      );
+      const data = await apiFetch<DocumentRecord[]>("/documents");
+      setDocuments(data);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
   const [reminderResult, setReminderResult] = useState<string | null>(null);
 
   async function runReminders() {
@@ -88,10 +108,14 @@ export default function DocumentsPage() {
         <Link href="/documents/new">+ Nouveau devis/facture</Link>{" "}
         <button type="button" onClick={runReminders}>
           Envoyer les relances de paiement
+        </button>{" "}
+        <button type="button" onClick={reconcilePayments}>
+          Rapprocher les paiements bancaires (Ponto)
         </button>
       </p>
       {error && <p role="alert">{error}</p>}
       {reminderResult && <p>{reminderResult}</p>}
+      {reconcileResult && <p>{reconcileResult}</p>}
 
       <table>
         <thead>
