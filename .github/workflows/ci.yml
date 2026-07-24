@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://user:password@localhost:5432/defa"
+      JWT_SECRET: "ci-test-secret"
+      NEXT_PUBLIC_API_URL: "http://localhost:3001"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Générer le client Prisma
+        run: npx prisma generate
+        working-directory: apps/api
+
+      - name: Typecheck — shared
+        run: npm run typecheck --workspace=packages/shared
+
+      - name: Typecheck — api
+        run: npm run typecheck --workspace=apps/api
+
+      - name: Typecheck — web
+        run: npm run typecheck --workspace=apps/web
+
+      - name: Typecheck — mobile
+        run: npm run typecheck --workspace=apps/mobile
+
+      - name: Tests — api
+        run: npm test --workspace=apps/api
+
+      - name: Build — web
+        run: npm run build --workspace=apps/web
