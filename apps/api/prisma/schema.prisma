@@ -76,6 +76,7 @@ model Account {
   projects     Project[]
   documents    BillingDocument[]
   payments     Payment[]
+  appointments Appointment[]
 }
 
 model User {
@@ -108,6 +109,7 @@ model Client {
 
   projects   Project[]
   documents  BillingDocument[]
+  appointments Appointment[]
 
   @@index([accountId])
 }
@@ -187,6 +189,25 @@ model Payment {
   source     PaymentSource @default(MANUAL)
   /// Id de la transaction bancaire Ponto d'origine — évite de rapprocher deux fois la même transaction.
   externalTransactionId String? @unique
+
+  @@index([accountId])
+}
+
+/// Rendez-vous avec un client — génère un email de confirmation avec pièce jointe .ics.
+model Appointment {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  client    Client   @relation(fields: [clientId], references: [id])
+  clientId  String
+  title     String
+  startsAt  DateTime
+  endsAt    DateTime
+  location  String?
+  notes     String?
+  /// Jeton public permettant de télécharger le .ics depuis le lien envoyé par email, sans compte.
+  calendarToken String   @unique @default(cuid())
+  createdAt     DateTime @default(now())
 
   @@index([accountId])
 }

@@ -14,3 +14,8 @@ export async function findOwnedClient(accountId: string, clientId: string) {
 export async function findOwnedProject(accountId: string, projectId: string) {
   return prisma.project.findFirst({ where: { id: projectId, accountId } });
 }
+
+/** Même contrôle que `findOwnedClient`, pour les rendez-vous. */
+export async function findOwnedAppointment(accountId: string, appointmentId: string) {
+  return prisma.appointment.findFirst({ where: { id: appointmentId, accountId } });
+}

@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { accountRouter } from "./routes/account";
+import { appointmentsRouter } from "./routes/appointments";
 import { authRouter } from "./routes/auth";
 import { billingRouter } from "./routes/billing";
 import { clientsRouter } from "./routes/clients";
@@ -45,6 +46,7 @@ app.use("/users", usersRouter);
 app.use("/clients", clientsRouter);
 app.use("/projects", projectsRouter);
 app.use("/documents", documentsRouter);
+app.use("/appointments", appointmentsRouter);
 app.use("/stats", statsRouter);
 app.use("/billing", billingRouter);
 app.use("/public", publicRouter);

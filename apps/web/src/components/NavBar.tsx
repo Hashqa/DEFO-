@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { IconAccount, IconBilling, IconClients, IconDashboard, IconInvoice, IconQuote } from "./icons";
+import { IconAccount, IconAppointment, IconBilling, IconClients, IconDashboard, IconInvoice, IconQuote } from "./icons";
 
 const LINKS = [
   { href: "/quotes", label: "Devis", Icon: IconQuote },
   { href: "/invoices", label: "Factures", Icon: IconInvoice },
+  { href: "/appointments", label: "Rendez-vous", Icon: IconAppointment },
   { href: "/clients", label: "Clients", Icon: IconClients },
   { href: "/dashboard", label: "Tableau de bord", Icon: IconDashboard },
   { href: "/account", label: "Compte", Icon: IconAccount },

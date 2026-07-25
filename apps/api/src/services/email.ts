@@ -1,7 +1,16 @@
+export interface EmailAttachment {
+  filename: string;
+  /** Contenu encodé en base64. */
+  content: string;
+}
+
 export interface EmailMessage {
   to: string;
   subject: string;
   body: string;
+  /** Version HTML optionnelle (ex. bouton "Ajouter au calendrier") — sinon le client mail affiche `body`. */
+  html?: string;
+  attachments?: EmailAttachment[];
 }
 
 export interface EmailSender {
@@ -34,6 +43,8 @@ export class ResendEmailSender implements EmailSender {
         to: [message.to],
         subject: message.subject,
         text: message.body,
+        ...(message.html ? { html: message.html } : {}),
+        ...(message.attachments ? { attachments: message.attachments } : {}),
       }),
     });
     if (!res.ok) {

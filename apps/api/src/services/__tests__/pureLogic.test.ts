@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { computeTotals } from "../documents";
 import { buildEpcQrPayload, generateEpcQrPng } from "../epcQr";
+import { buildIcsEvent } from "../ics";
 import { buildInvoicePayload } from "../peppol";
 
 describe("computeTotals", () => {
@@ -152,5 +153,39 @@ describe("buildInvoicePayload", () => {
   it("omet les coordonnées de paiement quand l'IBAN est absent", () => {
     const payload = buildInvoicePayload({ ...baseDocument, account: { ...baseDocument.account, iban: undefined } });
     expect(payload.document.paymentMeans).toBeUndefined();
+  });
+});
+
+describe("buildIcsEvent", () => {
+  const event = {
+    uid: "rdv-1",
+    title: "Visite chantier",
+    startsAt: new Date("2026-08-10T09:00:00.000Z"),
+    endsAt: new Date("2026-08-10T10:00:00.000Z"),
+    location: "Rue du Village 1, 4000 Liège",
+    description: "Prévoir le plan des travaux",
+  };
+
+  it("produit un VEVENT avec les dates au format UTC iCalendar", () => {
+    const ics = buildIcsEvent(event);
+    expect(ics).toContain("BEGIN:VCALENDAR");
+    expect(ics).toContain("BEGIN:VEVENT");
+    expect(ics).toContain("DTSTART:20260810T090000Z");
+    expect(ics).toContain("DTEND:20260810T100000Z");
+    expect(ics).toContain("SUMMARY:Visite chantier");
+    expect(ics).toContain("LOCATION:Rue du Village 1\\, 4000 Liège");
+    expect(ics).toContain("END:VEVENT");
+    expect(ics).toContain("END:VCALENDAR");
+  });
+
+  it("échappe les virgules et points-virgules dans le texte libre", () => {
+    const ics = buildIcsEvent({ ...event, title: "Rendez-vous; suivi, signature" });
+    expect(ics).toContain("SUMMARY:Rendez-vous\\; suivi\\, signature");
+  });
+
+  it("omet LOCATION/DESCRIPTION quand ils sont absents", () => {
+    const ics = buildIcsEvent({ uid: "rdv-2", title: "Appel", startsAt: event.startsAt, endsAt: event.endsAt });
+    expect(ics).not.toContain("LOCATION:");
+    expect(ics).not.toContain("DESCRIPTION:");
   });
 });
