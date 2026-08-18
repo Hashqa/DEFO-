@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cote de Reprise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --bg: #eaece9;
+    --surface: #ffffff;
+    --surface-2: #f5f6f4;
+    --ink: #1b1e1c;
+    --muted: #5c625e;
+    --border: #d5d9d5;
+    --accent: #bd6528;
+    --accent-ink: #ffffff;
+    --accent-soft: #f2e2d2;
+    --good: #3c7a52;
+    --good-soft: #e1eee4;
+    --bad: #b23a3a;
+    --bad-soft: #f5e1e1;
+    --neutral-dec: #3b6e8f;
+    --neutral-dec-soft: #dfeaf0;
+    --shadow: 0 1px 2px rgba(20, 20, 18, 0.06), 0 8px 24px -12px rgba(20, 20, 18, 0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141716;
+      --surface: #1d2120;
+      --surface-2: #232726;
+      --ink: #e9ece9;
+      --muted: #9ba39e;
+      --border: #2d3230;
+      --accent: #e08a46;
+      --accent-ink: #141716;
+      --accent-soft: #3a2a1c;
+      --good: #62c081;
+      --good-soft: #1e3323;
+      --bad: #e17878;
+      --bad-soft: #3b2222;
+      --neutral-dec: #7cb8db;
+      --neutral-dec-soft: #1e323d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #141716;
+    --surface: #1d2120;
+    --surface-2: #232726;
+    --ink: #e9ece9;
+    --muted: #9ba39e;
+    --border: #2d3230;
+    --accent: #e08a46;
+    --accent-ink: #141716;
+    --accent-soft: #3a2a1c;
+    --good: #62c081;
+    --good-soft: #1e3323;
+    --bad: #e17878;
+    --bad-soft: #3b2222;
+    --neutral-dec: #7cb8db;
+    --neutral-dec-soft: #1e323d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.25rem;
+  }
+
+  header.top .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  header.top h1 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  header.top .tag {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+  }
+
+  header.top p {
+    margin: 0;
+    max-width: 46ch;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  section.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-head h2 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+  }
+
+  .card-head .hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* --- Paramètres --- */
+  .params-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1.1rem;
+    padding: 1.3rem 1.4rem;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .field .unit-input {
+    position: relative;
+  }
+
+  .field input[type="number"],
+  .field input[type="text"] {
+    width: 100%;
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.98rem;
+    padding: 0.55rem 2.4rem 0.55rem 0.7rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .field input[type="text"] { font-family: "IBM Plex Sans", sans-serif; padding-right: 0.7rem; }
+
+  .field input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .field .unit-input .unit {
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.78rem;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  /* --- Main grid --- */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 880px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  .form-body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+
+  .segmented {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .segmented button {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+    border: none;
+    background: var(--surface-2);
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .segmented button + button { border-left: 1px solid var(--border); }
+  .segmented button[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .repair-block {
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    background: var(--surface-2);
+  }
+
+  .parts-list { display: flex; flex-direction: column; gap: 0.55rem; }
+  .part-row { display: grid; grid-template-columns: 1fr 130px auto; gap: 0.5rem; align-items: center; }
+  .part-row input[type="text"] { font-size: 0.9rem; padding: 0.45rem 0.6rem; }
+  .part-row input[type="number"] { font-size: 0.9rem; padding: 0.45rem 2rem 0.45rem 0.6rem; }
+
+  button.icon-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button.icon-btn:hover { border-color: var(--bad); color: var(--bad); }
+
+  button.add-part {
+    align-self: flex-start;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.4rem 0.7rem;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  button.add-part:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* --- Résultat --- */
+  .result-body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
+
+  .result-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 1rem;
+  }
+  .result-headline .label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .result-headline .value {
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 3.1rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    text-wrap: balance;
+  }
+  .result-headline .value.bad { color: var(--bad); }
+  .result-headline .sub { font-size: 0.85rem; color: var(--muted); }
+
+  .breakdown { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.88rem; }
+  .breakdown .line {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .breakdown .line span:first-child { font-family: "IBM Plex Sans", sans-serif; color: var(--muted); }
+  .breakdown .line.total {
+    border-top: 1px solid var(--border);
+    padding-top: 0.45rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .decision-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .decision-badge.good { background: var(--good-soft); color: var(--good); }
+  .decision-badge.bad { background: var(--bad-soft); color: var(--bad); }
+  .decision-badge.neutral { background: var(--neutral-dec-soft); color: var(--neutral-dec); }
+  .decision-badge .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: currentColor; }
+
+  .compare-note { font-size: 0.82rem; color: var(--muted); }
+
+  .primary-btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 0.7rem 1rem;
+    border-radius: 9px;
+    border: none;
+    background: var(--accent);
+    color: var(--accent-ink);
+    cursor: pointer;
+  }
+  .primary-btn:hover { filter: brightness(1.06); }
+  .primary-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* --- Table --- */
+  .table-wrap { overflow-x: auto; padding: 0.3rem 0.4rem 0.9rem; }
+  table.sourcing {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+    font-size: 0.88rem;
+  }
+  table.sourcing th {
+    text-align: left;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+  }
+  table.sourcing td {
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  table.sourcing td.num {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  table.sourcing tbody tr:hover { background: var(--surface-2); }
+  .type-pill {
+    font-size: 0.72rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+    color: var(--muted);
+  }
+  .empty-row td { color: var(--muted); text-align: center; padding: 1.6rem; font-size: 0.85rem; }
+
+  footer.note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    max-width: 68ch;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .primary-btn, button.icon-btn, button.add-part, .segmented button { transition: filter 0.12s ease, border-color 0.12s ease, color 0.12s ease; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <div class="brand">
+      <h1>Cote de Reprise</h1>
+      <span class="tag">Achat &middot; Réparation &middot; Revente</span>
+    </div>
+    <p>Calcule le prix d'achat maximum, le coût des pièces et la rentabilité d'un ordinateur ou d'une console avant de l'acheter — et si ça vaut le coup de le réparer.</p>
+  </header>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Paramètres de l'activité</h2>
+      <span class="hint">S'appliquent à toutes les évaluations ci-dessous</span>
+    </div>
+    <div class="params-grid">
+      <div class="field">
+        <label for="commission">Commission plateforme de vente</label>
+        <div class="unit-input">
+          <input type="number" id="commission" value="10" min="0" step="0.5" />
+          <span class="unit">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="shipping">Frais de port / emballage</label>
+        <div class="unit-input">
+          <input type="number" id="shipping" value="5" min="0" step="0.5" />
+          <span class="unit">€</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="laborRate">Taux horaire visé</label>
+        <div class="unit-input">
+          <input type="number" id="laborRate" value="15" min="0" step="0.5" />
+          <span class="unit">€/h</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="targetMargin">Marge minimum visée / appareil</label>
+        <div class="unit-input">
+          <input type="number" id="targetMargin" value="20" min="0" step="1" />
+          <span class="unit">€</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="main-grid">
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Évaluer un appareil</h2>
+      </div>
+      <div class="form-body">
+
+        <div class="row2">
+          <div class="field">
+            <label for="itemName">Modèle</label>
+            <input type="text" id="itemName" placeholder="ex. PS4 Slim 1To" />
+          </div>
+          <div class="field">
+            <label>Type</label>
+            <div class="segmented" id="typeToggle">
+              <button type="button" data-value="Ordinateur" aria-pressed="true">Ordinateur</button>
+              <button type="button" data-value="Console" aria-pressed="false">Console</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>État à l'achat</label>
+          <div class="segmented" id="stateToggle">
+            <button type="button" data-value="fonctionnel" aria-pressed="true">Fonctionnel</button>
+            <button type="button" data-value="reparer" aria-pressed="false">À réparer</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="resaleWorking">Prix de revente une fois fonctionnel</label>
+          <div class="unit-input">
+            <input type="number" id="resaleWorking" min="0" step="1" placeholder="0" />
+            <span class="unit">€</span>
+          </div>
+        </div>
+
+        <div class="repair-block" id="repairBlock" hidden>
+          <div class="field">
+            <label>Pièces de réparation nécessaires</label>
+            <div class="parts-list" id="partsList"></div>
+            <button type="button" class="add-part" id="addPart">+ Ajouter une pièce</button>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="laborHours">Heures de réparation estimées</label>
+              <div class="unit-input">
+                <input type="number" id="laborHours" min="0" step="0.25" placeholder="0" />
+                <span class="unit">h</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="resaleAsIs">Prix de revente en l'état (sans réparer)</label>
+              <div class="unit-input">
+                <input type="number" id="resaleAsIs" min="0" step="1" placeholder="optionnel" />
+                <span class="unit">€</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Résultat</h2>
+      </div>
+      <div class="result-body">
+
+        <div class="result-headline">
+          <span class="label">Prix d'achat maximum</span>
+          <span class="value" id="maxPriceValue">0 €</span>
+          <span class="sub" id="maxPriceSub">Renseignez un prix de revente pour commencer.</span>
+        </div>
+
+        <div class="breakdown" id="breakdown"></div>
+
+        <div id="decisionArea"></div>
+
+        <button type="button" class="primary-btn" id="addToList" disabled>Ajouter à la liste de sourcing</button>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Liste de sourcing</h2>
+      <span class="hint" id="listCount">0 appareil</span>
+    </div>
+    <div class="table-wrap">
+      <table class="sourcing">
+        <thead>
+          <tr>
+            <th>Modèle</th>
+            <th>Type</th>
+            <th>État</th>
+            <th>Prix d'achat max</th>
+            <th>Décision</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="sourcingBody">
+          <tr class="empty-row"><td colspan="6">Aucun appareil évalué pour l'instant.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="note">
+    Le prix d'achat maximum = prix de revente &minus; commission plateforme &minus; frais de port &minus; pièces &minus; (heures × taux horaire) &minus; marge visée. La liste de sourcing n'est conservée que le temps de la session (elle n'est pas sauvegardée).
+  </footer>
+
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const fmt = new Intl.NumberFormat('fr-BE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 });
+  const num = (el) => { const v = parseFloat(el.value); return Number.isFinite(v) ? v : 0; };
+
+  const state = {
+    type: 'Ordinateur',
+    condition: 'fonctionnel',
+    parts: [],
+  };
+
+  function addPartRow(name = '', price = '') {
+    const row = document.createElement('div');
+    row.className = 'part-row';
+    row.innerHTML = `
+      <input type="text" placeholder="ex. écran LCD" class="part-name" value="${name}" />
+      <div class="unit-input">
+        <input type="number" placeholder="0" min="0" step="0.5" class="part-price" value="${price}" />
+        <span class="unit">€</span>
+      </div>
+      <button type="button" class="icon-btn part-remove" aria-label="Retirer la pièce">✕</button>
+    `;
+    $('partsList').appendChild(row);
+    row.querySelector('.part-name').addEventListener('input', compute);
+    row.querySelector('.part-price').addEventListener('input', compute);
+    row.querySelector('.part-remove').addEventListener('click', () => { row.remove(); compute(); });
+  }
+
+  function setupSegmented(id, onChange) {
+    const group = $(id);
+    group.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        onChange(btn.dataset.value);
+        compute();
+      });
+    });
+  }
+
+  setupSegmented('typeToggle', (v) => { state.type = v; });
+  setupSegmented('stateToggle', (v) => {
+    state.condition = v;
+    $('repairBlock').hidden = v !== 'reparer';
+  });
+
+  $('addPart').addEventListener('click', () => addPartRow());
+  addPartRow();
+
+  ['commission', 'shipping', 'laborRate', 'targetMargin', 'resaleWorking', 'laborHours', 'resaleAsIs', 'itemName']
+    .forEach((id) => $(id).addEventListener('input', compute));
+
+  function partsTotal() {
+    return [...document.querySelectorAll('.part-price')].reduce((sum, el) => sum + num(el), 0);
+  }
+
+  function computeMax(resale, { includeRepair }) {
+    const commission = num($('commission')) / 100;
+    const shipping = num($('shipping'));
+    const margin = num($('targetMargin'));
+    const laborRate = num($('laborRate'));
+    const parts = includeRepair ? partsTotal() : 0;
+    const hours = includeRepair ? num($('laborHours')) : 0;
+    const labor = hours * laborRate;
+    const max = resale * (1 - commission) - shipping - parts - labor - margin;
+    return { max, commissionAmt: resale * commission, shipping, parts, labor, margin };
+  }
+
+  let lastResult = null;
+
+  function compute() {
+    const resaleWorking = num($('resaleWorking'));
+    const isRepair = state.condition === 'reparer';
+    const resaleAsIs = num($('resaleAsIs'));
+    const hasResale = resaleWorking > 0;
+
+    const repairCalc = computeMax(resaleWorking, { includeRepair: isRepair });
+    const asIsCalc = isRepair && resaleAsIs > 0 ? computeMax(resaleAsIs, { includeRepair: false }) : null;
+
+    let chosen = repairCalc;
+    let decisionLabel = isRepair ? 'Réparer avant revente' : 'Revendre fonctionnel';
+    let decisionType = 'neutral';
+
+    if (asIsCalc) {
+      if (asIsCalc.max > repairCalc.max) {
+        chosen = asIsCalc;
+        decisionLabel = 'Revendre en l\'état — ne pas réparer';
+        decisionType = 'neutral';
+      } else {
+        decisionLabel = 'Réparer avant revente';
+        decisionType = 'good';
+      }
+    }
+
+    if (!hasResale) {
+      $('maxPriceValue').textContent = '—';
+      $('maxPriceValue').classList.remove('bad');
+      $('maxPriceSub').textContent = "Renseignez un prix de revente pour commencer.";
+      $('breakdown').innerHTML = '';
+      $('decisionArea').innerHTML = '';
+      $('addToList').disabled = true;
+      lastResult = null;
+      return;
+    }
+
+    const badDeal = chosen.max <= 0;
+    $('maxPriceValue').textContent = badDeal ? '0 €' : fmt.format(chosen.max);
+    $('maxPriceValue').classList.toggle('bad', badDeal);
+    $('maxPriceSub').textContent = badDeal
+      ? "Objectif de marge inatteignable à ce prix de revente — ne pas acheter."
+      : `pour ${decisionLabel.toLowerCase()}`;
+
+    const lines = [
+      ['Prix de revente', chosen === repairCalc ? resaleWorking : resaleAsIs],
+      ['− Commission plateforme', -chosen.commissionAmt],
+      ['− Frais de port', -chosen.shipping],
+    ];
+    if (chosen.parts > 0) lines.push(['− Pièces', -chosen.parts]);
+    if (chosen.labor > 0) lines.push(['− Main d\'œuvre', -chosen.labor]);
+    lines.push(['− Marge visée', -chosen.margin]);
+    lines.push(['= Prix d\'achat maximum', chosen.max]);
+
+    $('breakdown').innerHTML = lines.map(([label, val], i) => `
+      <div class="line${i === lines.length - 1 ? ' total' : ''}">
+        <span>${label}</span>
+        <span>${fmt.format(val)}</span>
+      </div>
+    `).join('');
+
+    let decisionHtml = '';
+    if (asIsCalc) {
+      const delta = Math.abs(repairCalc.max - asIsCalc.max);
+      const hours = num($('laborHours'));
+      const hourlyValue = hours > 0
+        ? (resaleWorking * (1 - num($('commission')) / 100) - partsTotal() - resaleAsIs * (1 - num($('commission')) / 100)) / hours
+        : null;
+      decisionHtml = `
+        <div class="decision-badge ${decisionType}"><span class="dot"></span>${decisionLabel}</div>
+        <p class="compare-note">
+          ${decisionType === 'good' ? 'Réparer' : 'Revendre en l\'état'} laisse ${fmt.format(delta)} de marge
+          supplémentaire par rapport à l'autre option.
+          ${hourlyValue !== null ? `Valeur ajoutée par la réparation : ${fmt.format(hourlyValue)}/h.` : ''}
+        </p>
+      `;
+    } else if (badDeal) {
+      decisionHtml = `<div class="decision-badge bad"><span class="dot"></span>Ne pas acheter à ce prix</div>`;
+    } else {
+      decisionHtml = `<div class="decision-badge good"><span class="dot"></span>${decisionLabel}</div>`;
+    }
+    $('decisionArea').innerHTML = decisionHtml;
+
+    $('addToList').disabled = false;
+    lastResult = {
+      name: $('itemName').value.trim() || 'Sans nom',
+      type: state.type,
+      condition: isRepair ? 'À réparer' : 'Fonctionnel',
+      max: chosen.max,
+      badDeal,
+      decisionLabel,
+      decisionType,
+    };
+  }
+
+  const sourcingItems = [];
+
+  function renderTable() {
+    const body = $('sourcingBody');
+    $('listCount').textContent = `${sourcingItems.length} appareil${sourcingItems.length === 1 ? '' : 's'}`;
+    if (sourcingItems.length === 0) {
+      body.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun appareil évalué pour l\'instant.</td></tr>';
+      return;
+    }
+    body.innerHTML = sourcingItems.map((item, i) => `
+      <tr>
+        <td>${item.name}</td>
+        <td><span class="type-pill">${item.type}</span></td>
+        <td>${item.condition}</td>
+        <td class="num">${item.badDeal ? '—' : fmt.format(item.max)}</td>
+        <td><span class="decision-badge ${item.decisionType}"><span class="dot"></span>${item.decisionLabel}</span></td>
+        <td><button type="button" class="icon-btn" aria-label="Retirer" data-idx="${i}">✕</button></td>
+      </tr>
+    `).join('');
+    body.querySelectorAll('.icon-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        sourcingItems.splice(Number(btn.dataset.idx), 1);
+        renderTable();
+      });
+    });
+  }
+
+  $('addToList').addEventListener('click', () => {
+    if (!lastResult) return;
+    sourcingItems.unshift(lastResult);
+    renderTable();
+  });
+
+  compute();
+  renderTable();
+</script>
+</body>
+</html>
