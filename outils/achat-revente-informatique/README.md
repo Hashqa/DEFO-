@@ -7,13 +7,19 @@ ordinateur ou une console :
 - le **prix de revente minimum** à demander (si vous connaissez le prix d'achat — ex. "je
   l'achète 80 €, l'écran coûte 40 €, je la revends à combien ?"),
 - le **bénéfice réel** si les deux prix sont connus,
-- le **coût des pièces** de réparation nécessaires (avec une bibliothèque de prix
-  réutilisable),
+- le **coût des pièces** de réparation nécessaires, avec une bibliothèque de prix
+  réutilisable **pré-remplie** (SSD, RAM, écrans, batteries, Joy-Con, manettes, etc.),
 - s'il vaut mieux **réparer avant de revendre** ou **revendre en l'état**.
 
 ## Utilisation
 
 Ouvrir `calculateur.html` dans un navigateur (aucune installation, aucune dépendance).
+
+Une trentaine de pièces courantes (SSD, RAM, écrans/batteries de portable, Joy-Con,
+manettes, lentilles laser...) sont déjà dans la bibliothèque de prix au premier
+chargement, avec un prix indicatif — à ajuster selon vos fournisseurs. Le bouton
+« Recharger le catalogue par défaut » les remet en place sans écraser vos ajouts
+personnels.
 
 Renseigner une fois les paramètres de l'activité (commission de la plateforme de vente,
 frais de port, taux horaire visé, marge minimum par appareil). Pour chaque appareil,

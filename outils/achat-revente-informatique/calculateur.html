@@ -223,12 +223,16 @@
 
   .library-add {
     display: grid;
-    grid-template-columns: 1fr 150px auto;
+    grid-template-columns: 1fr 130px auto auto;
     gap: 0.6rem;
     align-items: end;
   }
+  @media (max-width: 720px) {
+    .library-add { grid-template-columns: 1fr 1fr; }
+    .library-add > button { grid-column: 1 / -1; }
+  }
 
-  .library-add button {
+  .library-add > button {
     font: inherit;
     font-weight: 600;
     font-size: 0.85rem;
@@ -239,9 +243,20 @@
     color: var(--ink);
     cursor: pointer;
   }
-  .library-add button:hover { border-color: var(--accent); color: var(--accent); }
+  .library-add > button:hover { border-color: var(--accent); color: var(--accent); }
 
-  .library-items { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .card-head-actions { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+
+  .library-items { display: flex; flex-direction: column; gap: 0.9rem; }
+  .library-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .library-group-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .library-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
   .library-chip {
     display: inline-flex;
@@ -553,19 +568,29 @@
   <section class="card">
     <div class="card-head">
       <h2>Bibliothèque de pièces</h2>
-      <span class="hint">Prix de référence réutilisables, mémorisés dans ce navigateur</span>
+      <div class="card-head-actions">
+        <span class="hint">Prix indicatifs (pièces génériques/compatibles), à ajuster selon vos fournisseurs</span>
+        <button type="button" class="add-part" id="libLoadDefaults">Recharger le catalogue par défaut</button>
+      </div>
     </div>
     <div class="library-body">
       <div class="library-add">
         <div class="field">
           <label for="libName">Pièce</label>
-          <input type="text" id="libName" placeholder="ex. écran Switch" />
+          <input type="text" id="libName" placeholder="ex. SSD 256 Go" />
         </div>
         <div class="field">
           <label for="libPrice">Prix</label>
           <div class="unit-input">
             <input type="number" id="libPrice" min="0" step="0.5" placeholder="0" />
             <span class="unit">€</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Catégorie</label>
+          <div class="segmented" id="libCategoryToggle">
+            <button type="button" data-value="Ordinateur" aria-pressed="true">Ordinateur</button>
+            <button type="button" data-value="Console" aria-pressed="false">Console</button>
           </div>
         </div>
         <button type="button" id="libAdd">Enregistrer</button>
@@ -721,18 +746,77 @@
   };
 
   /* ---------- Bibliothèque de pièces ---------- */
-  let library = loadJSON('library', []);
+  const DEFAULT_LIBRARY = [
+    { name: 'SSD SATA 256 Go', price: 25, category: 'Ordinateur' },
+    { name: 'SSD SATA 512 Go', price: 35, category: 'Ordinateur' },
+    { name: 'SSD NVMe 500 Go', price: 35, category: 'Ordinateur' },
+    { name: 'SSD NVMe 1 To', price: 55, category: 'Ordinateur' },
+    { name: 'Disque dur HDD 500 Go', price: 18, category: 'Ordinateur' },
+    { name: 'Disque dur HDD 1 To', price: 28, category: 'Ordinateur' },
+    { name: 'RAM DDR4 8 Go', price: 20, category: 'Ordinateur' },
+    { name: 'RAM DDR4 16 Go', price: 38, category: 'Ordinateur' },
+    { name: 'Écran portable 15.6" (dalle)', price: 45, category: 'Ordinateur' },
+    { name: 'Écran portable 13-14" (dalle)', price: 55, category: 'Ordinateur' },
+    { name: 'Batterie portable', price: 35, category: 'Ordinateur' },
+    { name: 'Chargeur secteur portable', price: 15, category: 'Ordinateur' },
+    { name: 'Clavier portable (nappe)', price: 22, category: 'Ordinateur' },
+    { name: 'Charnières écran (paire)', price: 15, category: 'Ordinateur' },
+    { name: 'Pâte thermique + nettoyage', price: 8, category: 'Ordinateur' },
+    { name: 'Ventilateur/dissipateur portable', price: 18, category: 'Ordinateur' },
+    { name: "Connecteur d'alimentation (DC jack)", price: 12, category: 'Ordinateur' },
+    { name: 'Joy-Con (unité)', price: 25, category: 'Console' },
+    { name: 'Kit réparation stick drift Joy-Con', price: 8, category: 'Console' },
+    { name: 'Écran Switch (dalle LCD)', price: 35, category: 'Console' },
+    { name: 'Vitre tactile Switch', price: 15, category: 'Console' },
+    { name: 'Batterie Switch', price: 15, category: 'Console' },
+    { name: 'Ventilateur Switch', price: 10, category: 'Console' },
+    { name: 'Manette PS4/Xbox (remplacement)', price: 35, category: 'Console' },
+    { name: 'Kit stick drift manette', price: 8, category: 'Console' },
+    { name: 'Lentille laser PS4/Xbox', price: 15, category: 'Console' },
+    { name: 'Alimentation PS4', price: 30, category: 'Console' },
+    { name: 'Lecteur disque Xbox One', price: 30, category: 'Console' },
+    { name: 'Pâte thermique console + nettoyage', price: 10, category: 'Console' },
+    { name: 'Câble HDMI', price: 6, category: 'Console' },
+  ];
+
+  let libCategory = 'Ordinateur';
+
+  let library;
+  {
+    let raw = null;
+    try { raw = localStorage.getItem(STORAGE_PREFIX + 'library'); } catch (e) { /* stockage indisponible */ }
+    if (raw) {
+      try { library = JSON.parse(raw); } catch (e) { library = DEFAULT_LIBRARY.slice(); }
+    } else {
+      library = DEFAULT_LIBRARY.slice();
+      saveJSON('library', library);
+    }
+  }
 
   function renderLibrary() {
     const list = $('libraryList');
-    list.innerHTML = library.length === 0
-      ? '<p class="library-empty">Aucune pièce enregistrée pour l\'instant.</p>'
-      : library.map((item, i) => `
-        <span class="library-chip">
-          ${escapeHtml(item.name)} <span class="chip-price">${fmt.format(item.price)}</span>
-          <button type="button" data-idx="${i}" aria-label="Retirer ${escapeHtml(item.name)} de la bibliothèque">✕</button>
-        </span>
-      `).join('');
+    if (library.length === 0) {
+      list.innerHTML = '<p class="library-empty">Aucune pièce enregistrée pour l\'instant.</p>';
+    } else {
+      const withIndex = library.map((item, i) => ({ ...item, i }));
+      list.innerHTML = ['Ordinateur', 'Console', 'Autre'].map((cat) => {
+        const items = withIndex.filter((item) => (item.category || 'Autre') === cat);
+        if (items.length === 0) return '';
+        return `
+          <div class="library-group">
+            <div class="library-group-title">${cat}</div>
+            <div class="library-chips">
+              ${items.map((item) => `
+                <span class="library-chip">
+                  ${escapeHtml(item.name)} <span class="chip-price">${fmt.format(item.price)}</span>
+                  <button type="button" data-idx="${item.i}" aria-label="Retirer ${escapeHtml(item.name)} de la bibliothèque">✕</button>
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
     list.querySelectorAll('button').forEach((btn) => {
       btn.addEventListener('click', () => {
         library.splice(Number(btn.dataset.idx), 1);
@@ -743,23 +827,39 @@
     $('partsLibraryList').innerHTML = library.map((item) => `<option value="${escapeHtml(item.name)}">`).join('');
   }
 
-  function upsertLibrary(name, price) {
+  function upsertLibrary(name, price, category) {
     if (!name || !(price > 0)) return;
     const existing = library.find((item) => item.name.toLowerCase() === name.toLowerCase());
-    if (existing) existing.price = price;
-    else library.push({ name, price });
+    if (existing) {
+      existing.price = price;
+      if (category) existing.category = category;
+    } else {
+      library.push({ name, price, category: category || 'Autre' });
+    }
     saveJSON('library', library);
     renderLibrary();
   }
+
+  setupSegmented('libCategoryToggle', (v) => { libCategory = v; });
 
   $('libAdd').addEventListener('click', () => {
     const name = $('libName').value.trim();
     const price = num($('libPrice'));
     if (!name || price <= 0) return;
-    upsertLibrary(name, price);
+    upsertLibrary(name, price, libCategory);
     $('libName').value = '';
     $('libPrice').value = '';
     $('libName').focus();
+  });
+
+  $('libLoadDefaults').addEventListener('click', () => {
+    DEFAULT_LIBRARY.forEach((def) => {
+      if (!library.some((item) => item.name.toLowerCase() === def.name.toLowerCase())) {
+        library.push({ ...def });
+      }
+    });
+    saveJSON('library', library);
+    renderLibrary();
   });
 
   /* ---------- Pièces de l'appareil évalué ---------- */
@@ -788,7 +888,7 @@
     });
     priceInput.addEventListener('input', compute);
     row.querySelector('.part-save').addEventListener('click', () => {
-      upsertLibrary(nameInput.value.trim(), num(priceInput));
+      upsertLibrary(nameInput.value.trim(), num(priceInput), state.type);
     });
     row.querySelector('.part-remove').addEventListener('click', () => { row.remove(); compute(); });
   }
