@@ -127,7 +127,7 @@
 
   header.top p {
     margin: 0;
-    max-width: 46ch;
+    max-width: 48ch;
     color: var(--muted);
     font-size: 0.92rem;
   }
@@ -213,10 +213,70 @@
     pointer-events: none;
   }
 
+  /* --- Bibliothèque de pièces --- */
+  .library-body {
+    padding: 1.1rem 1.4rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .library-add {
+    display: grid;
+    grid-template-columns: 1fr 150px auto;
+    gap: 0.6rem;
+    align-items: end;
+  }
+
+  .library-add button {
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .library-add button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .library-items { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  .library-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.32rem 0.4rem 0.32rem 0.8rem;
+    font-size: 0.82rem;
+  }
+  .library-chip .chip-price {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+  .library-chip button {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+  .library-chip button:hover { color: var(--bad); }
+
+  .library-empty { color: var(--muted); font-size: 0.85rem; margin: 0; }
+
   /* --- Main grid --- */
   .main-grid {
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
+    grid-template-columns: 1fr 1.2fr;
     gap: 1.5rem;
     align-items: start;
   }
@@ -262,13 +322,14 @@
   }
 
   .parts-list { display: flex; flex-direction: column; gap: 0.55rem; }
-  .part-row { display: grid; grid-template-columns: 1fr 130px auto; gap: 0.5rem; align-items: center; }
+  .part-row { display: grid; grid-template-columns: 1fr 120px auto auto; gap: 0.45rem; align-items: center; }
   .part-row input[type="text"] { font-size: 0.9rem; padding: 0.45rem 0.6rem; }
-  .part-row input[type="number"] { font-size: 0.9rem; padding: 0.45rem 2rem 0.45rem 0.6rem; }
+  .part-row input[type="number"] { font-size: 0.9rem; padding: 0.45rem 1.9rem 0.45rem 0.6rem; }
 
   button.icon-btn {
     width: 2rem;
     height: 2rem;
+    flex: none;
     border-radius: 7px;
     border: 1px solid var(--border);
     background: var(--surface);
@@ -281,6 +342,7 @@
     justify-content: center;
   }
   button.icon-btn:hover { border-color: var(--bad); color: var(--bad); }
+  button.icon-btn.part-save:hover { border-color: var(--accent); color: var(--accent); }
 
   button.add-part {
     align-self: flex-start;
@@ -299,33 +361,57 @@
   /* --- Résultat --- */
   .result-body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
 
-  .result-headline {
+  .scenarios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .scenario {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
-    border-bottom: 1px dashed var(--border);
-    padding-bottom: 1rem;
+    gap: 0.85rem;
+    background: var(--surface-2);
   }
-  .result-headline .label {
-    font-size: 0.78rem;
+
+  .scenario-title {
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .stat-block { display: flex; flex-direction: column; gap: 0.15rem; }
+  .stat-block .stat-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     color: var(--muted);
   }
-  .result-headline .value {
+  .stat-block.primary .stat-value {
     font-family: "IBM Plex Sans Condensed", sans-serif;
     font-weight: 700;
-    font-size: 3.1rem;
-    line-height: 1;
+    font-size: 2rem;
+    line-height: 1.1;
     letter-spacing: -0.01em;
     font-variant-numeric: tabular-nums;
     color: var(--accent);
     text-wrap: balance;
   }
-  .result-headline .value.bad { color: var(--bad); }
-  .result-headline .sub { font-size: 0.85rem; color: var(--muted); }
+  .stat-block:not(.primary) .stat-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.98rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-value.bad { color: var(--bad); }
+  .stat-value.good { color: var(--good); }
 
-  .breakdown { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.88rem; }
+  .breakdown { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem; }
   .breakdown .line {
     display: flex;
     justify-content: space-between;
@@ -334,12 +420,6 @@
     font-variant-numeric: tabular-nums;
   }
   .breakdown .line span:first-child { font-family: "IBM Plex Sans", sans-serif; color: var(--muted); }
-  .breakdown .line.total {
-    border-top: 1px solid var(--border);
-    padding-top: 0.45rem;
-    font-weight: 600;
-    color: var(--ink);
-  }
 
   .decision-badge {
     display: inline-flex;
@@ -355,7 +435,7 @@
   .decision-badge.neutral { background: var(--neutral-dec-soft); color: var(--neutral-dec); }
   .decision-badge .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: currentColor; }
 
-  .compare-note { font-size: 0.82rem; color: var(--muted); }
+  .compare-note { font-size: 0.82rem; color: var(--muted); margin: 0.5rem 0 0; }
 
   .primary-btn {
     font: inherit;
@@ -376,7 +456,7 @@
   table.sourcing {
     width: 100%;
     border-collapse: collapse;
-    min-width: 720px;
+    min-width: 860px;
     font-size: 0.88rem;
   }
   table.sourcing th {
@@ -410,23 +490,27 @@
   footer.note {
     font-size: 0.78rem;
     color: var(--muted);
-    max-width: 68ch;
+    max-width: 72ch;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .primary-btn, button.icon-btn, button.add-part, .segmented button { transition: filter 0.12s ease, border-color 0.12s ease, color 0.12s ease; }
+    .primary-btn, button.icon-btn, button.add-part, .segmented button, .library-add button {
+      transition: filter 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
   }
 </style>
 </head>
 <body>
 <div class="page">
 
+  <datalist id="partsLibraryList"></datalist>
+
   <header class="top">
     <div class="brand">
       <h1>Cote de Reprise</h1>
       <span class="tag">Achat &middot; Réparation &middot; Revente</span>
     </div>
-    <p>Calcule le prix d'achat maximum, le coût des pièces et la rentabilité d'un ordinateur ou d'une console avant de l'acheter — et si ça vaut le coup de le réparer.</p>
+    <p>Calcule le prix d'achat maximum ou le prix de revente minimum, le coût des pièces et la rentabilité d'un ordinateur ou d'une console — et si ça vaut le coup de le réparer.</p>
   </header>
 
   <section class="card">
@@ -466,6 +550,30 @@
     </div>
   </section>
 
+  <section class="card">
+    <div class="card-head">
+      <h2>Bibliothèque de pièces</h2>
+      <span class="hint">Prix de référence réutilisables, mémorisés dans ce navigateur</span>
+    </div>
+    <div class="library-body">
+      <div class="library-add">
+        <div class="field">
+          <label for="libName">Pièce</label>
+          <input type="text" id="libName" placeholder="ex. écran Switch" />
+        </div>
+        <div class="field">
+          <label for="libPrice">Prix</label>
+          <div class="unit-input">
+            <input type="number" id="libPrice" min="0" step="0.5" placeholder="0" />
+            <span class="unit">€</span>
+          </div>
+        </div>
+        <button type="button" id="libAdd">Enregistrer</button>
+      </div>
+      <div class="library-items" id="libraryList"></div>
+    </div>
+  </section>
+
   <div class="main-grid">
 
     <section class="card">
@@ -477,7 +585,7 @@
         <div class="row2">
           <div class="field">
             <label for="itemName">Modèle</label>
-            <input type="text" id="itemName" placeholder="ex. PS4 Slim 1To" />
+            <input type="text" id="itemName" placeholder="ex. Switch OLED" />
           </div>
           <div class="field">
             <label>Type</label>
@@ -497,9 +605,17 @@
         </div>
 
         <div class="field">
+          <label for="purchasePrice">Prix d'achat (connu ou envisagé)</label>
+          <div class="unit-input">
+            <input type="number" id="purchasePrice" min="0" step="1" placeholder="optionnel" />
+            <span class="unit">€</span>
+          </div>
+        </div>
+
+        <div class="field">
           <label for="resaleWorking">Prix de revente une fois fonctionnel</label>
           <div class="unit-input">
-            <input type="number" id="resaleWorking" min="0" step="1" placeholder="0" />
+            <input type="number" id="resaleWorking" min="0" step="1" placeholder="optionnel" />
             <span class="unit">€</span>
           </div>
         </div>
@@ -528,6 +644,8 @@
           </div>
         </div>
 
+        <p class="compare-note">Renseignez le prix de revente pour obtenir le prix d'achat maximum, le prix d'achat pour obtenir le prix de revente minimum — ou les deux pour voir le bénéfice réel.</p>
+
       </div>
     </section>
 
@@ -536,17 +654,8 @@
         <h2>Résultat</h2>
       </div>
       <div class="result-body">
-
-        <div class="result-headline">
-          <span class="label">Prix d'achat maximum</span>
-          <span class="value" id="maxPriceValue">0 €</span>
-          <span class="sub" id="maxPriceSub">Renseignez un prix de revente pour commencer.</span>
-        </div>
-
-        <div class="breakdown" id="breakdown"></div>
-
+        <div class="scenarios" id="scenarios"></div>
         <div id="decisionArea"></div>
-
         <button type="button" class="primary-btn" id="addToList" disabled>Ajouter à la liste de sourcing</button>
       </div>
     </section>
@@ -565,20 +674,24 @@
             <th>Modèle</th>
             <th>Type</th>
             <th>État</th>
-            <th>Prix d'achat max</th>
+            <th>Achat</th>
+            <th>Revente</th>
+            <th>Résultat</th>
             <th>Décision</th>
             <th></th>
           </tr>
         </thead>
         <tbody id="sourcingBody">
-          <tr class="empty-row"><td colspan="6">Aucun appareil évalué pour l'instant.</td></tr>
+          <tr class="empty-row"><td colspan="8">Aucun appareil évalué pour l'instant.</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
   <footer class="note">
-    Le prix d'achat maximum = prix de revente &minus; commission plateforme &minus; frais de port &minus; pièces &minus; (heures × taux horaire) &minus; marge visée. La liste de sourcing n'est conservée que le temps de la session (elle n'est pas sauvegardée).
+    Prix d'achat maximum = prix de revente &minus; commission &minus; frais de port &minus; pièces &minus; (heures × taux horaire) &minus; marge visée.
+    Prix de revente minimum = (prix d'achat + frais de port + pièces + main d'œuvre + marge visée) ÷ (1 &minus; commission).
+    Les paramètres, la bibliothèque de pièces et la liste de sourcing sont mémorisés dans ce navigateur (localStorage) — rien n'est envoyé ailleurs.
   </footer>
 
 </div>
@@ -587,27 +700,96 @@
   const $ = (id) => document.getElementById(id);
   const fmt = new Intl.NumberFormat('fr-BE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 });
   const num = (el) => { const v = parseFloat(el.value); return Number.isFinite(v) ? v : 0; };
+  const escapeHtml = (str) => String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const STORAGE_PREFIX = 'cote-de-reprise:';
+  function loadJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(STORAGE_PREFIX + key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+  function saveJSON(key, value) {
+    try { localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value)); } catch (e) { /* stockage indisponible */ }
+  }
 
   const state = {
     type: 'Ordinateur',
     condition: 'fonctionnel',
-    parts: [],
   };
 
+  /* ---------- Bibliothèque de pièces ---------- */
+  let library = loadJSON('library', []);
+
+  function renderLibrary() {
+    const list = $('libraryList');
+    list.innerHTML = library.length === 0
+      ? '<p class="library-empty">Aucune pièce enregistrée pour l\'instant.</p>'
+      : library.map((item, i) => `
+        <span class="library-chip">
+          ${escapeHtml(item.name)} <span class="chip-price">${fmt.format(item.price)}</span>
+          <button type="button" data-idx="${i}" aria-label="Retirer ${escapeHtml(item.name)} de la bibliothèque">✕</button>
+        </span>
+      `).join('');
+    list.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        library.splice(Number(btn.dataset.idx), 1);
+        saveJSON('library', library);
+        renderLibrary();
+      });
+    });
+    $('partsLibraryList').innerHTML = library.map((item) => `<option value="${escapeHtml(item.name)}">`).join('');
+  }
+
+  function upsertLibrary(name, price) {
+    if (!name || !(price > 0)) return;
+    const existing = library.find((item) => item.name.toLowerCase() === name.toLowerCase());
+    if (existing) existing.price = price;
+    else library.push({ name, price });
+    saveJSON('library', library);
+    renderLibrary();
+  }
+
+  $('libAdd').addEventListener('click', () => {
+    const name = $('libName').value.trim();
+    const price = num($('libPrice'));
+    if (!name || price <= 0) return;
+    upsertLibrary(name, price);
+    $('libName').value = '';
+    $('libPrice').value = '';
+    $('libName').focus();
+  });
+
+  /* ---------- Pièces de l'appareil évalué ---------- */
   function addPartRow(name = '', price = '') {
     const row = document.createElement('div');
     row.className = 'part-row';
     row.innerHTML = `
-      <input type="text" placeholder="ex. écran LCD" class="part-name" value="${name}" />
+      <input type="text" placeholder="ex. écran LCD" class="part-name" list="partsLibraryList" value="${escapeHtml(name)}" />
       <div class="unit-input">
         <input type="number" placeholder="0" min="0" step="0.5" class="part-price" value="${price}" />
         <span class="unit">€</span>
       </div>
+      <button type="button" class="icon-btn part-save" title="Enregistrer dans la bibliothèque" aria-label="Enregistrer cette pièce dans la bibliothèque">💾</button>
       <button type="button" class="icon-btn part-remove" aria-label="Retirer la pièce">✕</button>
     `;
     $('partsList').appendChild(row);
-    row.querySelector('.part-name').addEventListener('input', compute);
-    row.querySelector('.part-price').addEventListener('input', compute);
+    const nameInput = row.querySelector('.part-name');
+    const priceInput = row.querySelector('.part-price');
+    nameInput.addEventListener('input', compute);
+    nameInput.addEventListener('change', () => {
+      const match = library.find((item) => item.name.toLowerCase() === nameInput.value.trim().toLowerCase());
+      if (match && !(num(priceInput) > 0)) {
+        priceInput.value = match.price;
+        compute();
+      }
+    });
+    priceInput.addEventListener('input', compute);
+    row.querySelector('.part-save').addEventListener('click', () => {
+      upsertLibrary(nameInput.value.trim(), num(priceInput));
+    });
     row.querySelector('.part-remove').addEventListener('click', () => { row.remove(); compute(); });
   }
 
@@ -632,14 +814,29 @@
   $('addPart').addEventListener('click', () => addPartRow());
   addPartRow();
 
-  ['commission', 'shipping', 'laborRate', 'targetMargin', 'resaleWorking', 'laborHours', 'resaleAsIs', 'itemName']
-    .forEach((id) => $(id).addEventListener('input', compute));
-
   function partsTotal() {
     return [...document.querySelectorAll('.part-price')].reduce((sum, el) => sum + num(el), 0);
   }
 
-  function computeMax(resale, { includeRepair }) {
+  /* ---------- Paramètres persistés ---------- */
+  const paramIds = ['commission', 'shipping', 'laborRate', 'targetMargin'];
+  const savedParams = loadJSON('params', null);
+  if (savedParams) paramIds.forEach((id) => { if (savedParams[id] !== undefined) $(id).value = savedParams[id]; });
+  function saveParams() {
+    const values = {};
+    paramIds.forEach((id) => { values[id] = $(id).value; });
+    saveJSON('params', values);
+  }
+
+  [...paramIds, 'purchasePrice', 'resaleWorking', 'laborHours', 'resaleAsIs', 'itemName'].forEach((id) => {
+    $(id).addEventListener('input', () => {
+      if (paramIds.includes(id)) saveParams();
+      compute();
+    });
+  });
+
+  /* ---------- Calcul ---------- */
+  function evaluatePath(resalePrice, purchasePrice, { includeRepair }) {
     const commission = num($('commission')) / 100;
     const shipping = num($('shipping'));
     const margin = num($('targetMargin'));
@@ -647,90 +844,156 @@
     const parts = includeRepair ? partsTotal() : 0;
     const hours = includeRepair ? num($('laborHours')) : 0;
     const labor = hours * laborRate;
-    const max = resale * (1 - commission) - shipping - parts - labor - margin;
-    return { max, commissionAmt: resale * commission, shipping, parts, labor, margin };
+
+    const out = { commission, shipping, margin, parts, labor, hours };
+    if (resalePrice > 0) {
+      out.resalePrice = resalePrice;
+      out.commissionAmt = resalePrice * commission;
+      out.maxPurchase = resalePrice * (1 - commission) - shipping - parts - labor - margin;
+    }
+    if (purchasePrice > 0) {
+      out.purchasePrice = purchasePrice;
+      out.minResale = (purchasePrice + shipping + parts + labor + margin) / (1 - commission);
+    }
+    if (resalePrice > 0 && purchasePrice > 0) {
+      out.profit = resalePrice * (1 - commission) - shipping - parts - labor - purchasePrice;
+    }
+    return out;
+  }
+
+  function primaryMetric(path) {
+    if (path.profit !== undefined) return 'profit';
+    if (path.minResale !== undefined) return 'minResale';
+    if (path.maxPurchase !== undefined) return 'maxPurchase';
+    return null;
+  }
+
+  const METRIC_LABEL = {
+    profit: 'Bénéfice réel estimé',
+    minResale: 'Prix de revente minimum',
+    maxPurchase: "Prix d'achat maximum",
+  };
+  const METRIC_TABLE_LABEL = { profit: 'Bénéfice', minResale: 'Revente min', maxPurchase: 'Achat max' };
+
+  function statBlockHtml(key, path, primary) {
+    const value = path[key];
+    let display = fmt.format(value);
+    let cls = '';
+    if (key === 'maxPurchase' && value <= 0) { display = '0 €'; cls = 'bad'; }
+    if (key === 'profit') cls = value >= path.margin ? 'good' : 'bad';
+    return `
+      <div class="stat-block${primary ? ' primary' : ''}">
+        <span class="stat-label">${METRIC_LABEL[key]}</span>
+        <span class="stat-value ${cls}">${display}</span>
+      </div>
+    `;
+  }
+
+  function breakdownHtml(path) {
+    const lines = [];
+    if (path.resalePrice !== undefined) lines.push(['Prix de revente', path.resalePrice]);
+    if (path.purchasePrice !== undefined) lines.push(["− Prix d'achat", -path.purchasePrice]);
+    if (path.commissionAmt !== undefined) lines.push(['− Commission plateforme', -path.commissionAmt]);
+    lines.push(['− Frais de port', -path.shipping]);
+    if (path.parts > 0) lines.push(['− Pièces', -path.parts]);
+    if (path.labor > 0) lines.push(["− Main d'œuvre", -path.labor]);
+    if (path.profit === undefined) lines.push(['− Marge visée', -path.margin]);
+    else lines.push(['Marge visée (objectif)', path.margin]);
+    return `<div class="breakdown">${lines.map(([label, val]) => `
+      <div class="line"><span>${label}</span><span>${fmt.format(val)}</span></div>
+    `).join('')}</div>`;
+  }
+
+  function scenarioHtml(path, title) {
+    if (!path) return '';
+    const metric = primaryMetric(path);
+    const secondary = ['profit', 'minResale', 'maxPurchase'].filter((k) => k !== metric && path[k] !== undefined);
+    return `
+      <div class="scenario">
+        <div class="scenario-title">${title}</div>
+        ${statBlockHtml(metric, path, true)}
+        ${secondary.map((k) => statBlockHtml(k, path, false)).join('')}
+        ${breakdownHtml(path)}
+      </div>
+    `;
+  }
+
+  function compareScenarios(a, b) {
+    // Comparer seulement sur des prix de revente réels (estimés sur le marché) : comparer les
+    // prix de revente minimums serait trompeur, la version non réparée paraît toujours "meilleure"
+    // puisqu'elle évite simplement le coût des pièces, sans dire quoi que ce soit du marché réel.
+    if (a.profit !== undefined && b.profit !== undefined) {
+      const delta = Math.abs(a.profit - b.profit);
+      const winner = a.profit >= b.profit ? 'functional' : 'asIs';
+      return { winner, note: `${winner === 'functional' ? 'Réparer' : "Revendre en l'état"} rapporte ${fmt.format(delta)} de bénéfice réel en plus que l'autre option.` };
+    }
+    if (a.maxPurchase !== undefined && b.maxPurchase !== undefined) {
+      const delta = Math.abs(a.maxPurchase - b.maxPurchase);
+      const winner = a.maxPurchase >= b.maxPurchase ? 'functional' : 'asIs';
+      return { winner, note: `${winner === 'functional' ? 'Réparer' : "Revendre en l'état"} laisse ${fmt.format(delta)} de marge supplémentaire par rapport à l'autre option.` };
+    }
+    return null;
   }
 
   let lastResult = null;
 
   function compute() {
+    const purchasePrice = num($('purchasePrice'));
     const resaleWorking = num($('resaleWorking'));
     const isRepair = state.condition === 'reparer';
     const resaleAsIs = num($('resaleAsIs'));
-    const hasResale = resaleWorking > 0;
 
-    const repairCalc = computeMax(resaleWorking, { includeRepair: isRepair });
-    const asIsCalc = isRepair && resaleAsIs > 0 ? computeMax(resaleAsIs, { includeRepair: false }) : null;
+    const functional = (resaleWorking > 0 || purchasePrice > 0)
+      ? evaluatePath(resaleWorking, purchasePrice, { includeRepair: isRepair })
+      : null;
+    const asIs = (isRepair && (resaleAsIs > 0 || purchasePrice > 0))
+      ? evaluatePath(resaleAsIs, purchasePrice, { includeRepair: false })
+      : null;
 
-    let chosen = repairCalc;
-    let decisionLabel = isRepair ? 'Réparer avant revente' : 'Revendre fonctionnel';
-    let decisionType = 'neutral';
-
-    if (asIsCalc) {
-      if (asIsCalc.max > repairCalc.max) {
-        chosen = asIsCalc;
-        decisionLabel = 'Revendre en l\'état — ne pas réparer';
-        decisionType = 'neutral';
-      } else {
-        decisionLabel = 'Réparer avant revente';
-        decisionType = 'good';
-      }
-    }
-
-    if (!hasResale) {
-      $('maxPriceValue').textContent = '—';
-      $('maxPriceValue').classList.remove('bad');
-      $('maxPriceSub').textContent = "Renseignez un prix de revente pour commencer.";
-      $('breakdown').innerHTML = '';
-      $('decisionArea').innerHTML = '';
+    if (!functional && !asIs) {
+      $('scenarios').innerHTML = '';
+      $('decisionArea').innerHTML = '<p class="compare-note">Renseignez un prix d\'achat et/ou un prix de revente pour commencer.</p>';
       $('addToList').disabled = true;
       lastResult = null;
       return;
     }
 
-    const badDeal = chosen.max <= 0;
-    $('maxPriceValue').textContent = badDeal ? '0 €' : fmt.format(chosen.max);
-    $('maxPriceValue').classList.toggle('bad', badDeal);
-    $('maxPriceSub').textContent = badDeal
-      ? "Objectif de marge inatteignable à ce prix de revente — ne pas acheter."
-      : `pour ${decisionLabel.toLowerCase()}`;
+    const functionalTitle = isRepair ? 'Après réparation' : 'Fonctionnel';
+    $('scenarios').innerHTML = scenarioHtml(functional, functionalTitle) + scenarioHtml(asIs, "En l'état (non réparé)");
 
-    const lines = [
-      ['Prix de revente', chosen === repairCalc ? resaleWorking : resaleAsIs],
-      ['− Commission plateforme', -chosen.commissionAmt],
-      ['− Frais de port', -chosen.shipping],
-    ];
-    if (chosen.parts > 0) lines.push(['− Pièces', -chosen.parts]);
-    if (chosen.labor > 0) lines.push(['− Main d\'œuvre', -chosen.labor]);
-    lines.push(['− Marge visée', -chosen.margin]);
-    lines.push(['= Prix d\'achat maximum', chosen.max]);
-
-    $('breakdown').innerHTML = lines.map(([label, val], i) => `
-      <div class="line${i === lines.length - 1 ? ' total' : ''}">
-        <span>${label}</span>
-        <span>${fmt.format(val)}</span>
-      </div>
-    `).join('');
-
+    let chosen = functional || asIs;
+    let decisionLabel = isRepair ? 'Réparer avant revente' : 'Revendre fonctionnel';
+    let decisionType = 'neutral';
     let decisionHtml = '';
-    if (asIsCalc) {
-      const delta = Math.abs(repairCalc.max - asIsCalc.max);
-      const hours = num($('laborHours'));
-      const hourlyValue = hours > 0
-        ? (resaleWorking * (1 - num($('commission')) / 100) - partsTotal() - resaleAsIs * (1 - num($('commission')) / 100)) / hours
-        : null;
-      decisionHtml = `
-        <div class="decision-badge ${decisionType}"><span class="dot"></span>${decisionLabel}</div>
-        <p class="compare-note">
-          ${decisionType === 'good' ? 'Réparer' : 'Revendre en l\'état'} laisse ${fmt.format(delta)} de marge
-          supplémentaire par rapport à l'autre option.
-          ${hourlyValue !== null ? `Valeur ajoutée par la réparation : ${fmt.format(hourlyValue)}/h.` : ''}
-        </p>
-      `;
-    } else if (badDeal) {
-      decisionHtml = `<div class="decision-badge bad"><span class="dot"></span>Ne pas acheter à ce prix</div>`;
-    } else {
-      decisionHtml = `<div class="decision-badge good"><span class="dot"></span>${decisionLabel}</div>`;
+
+    if (functional && asIs) {
+      const cmp = compareScenarios(functional, asIs);
+      if (cmp) {
+        chosen = cmp.winner === 'functional' ? functional : asIs;
+        decisionLabel = cmp.winner === 'functional' ? 'Réparer avant revente' : "Revendre en l'état — ne pas réparer";
+        decisionType = cmp.winner === 'functional' ? 'good' : 'neutral';
+        decisionHtml = `
+          <div class="decision-badge ${decisionType}"><span class="dot"></span>${decisionLabel}</div>
+          <p class="compare-note">${cmp.note}</p>
+        `;
+      } else {
+        decisionHtml = `<p class="compare-note">Ajoutez un prix de revente estimé (fonctionnel et/ou en l'état) pour comparer les deux options — sans ça, l'état non réparé demandera toujours un prix de revente minimum plus bas, ce qui ne dit rien de ce que le marché paiera réellement.</p>`;
+      }
+    } else if (functional) {
+      const metric = primaryMetric(functional);
+      if (metric === 'maxPurchase' && functional.maxPurchase <= 0) {
+        decisionType = 'bad';
+        decisionHtml = `<div class="decision-badge bad"><span class="dot"></span>Ne pas acheter à ce prix</div>`;
+      } else if (metric === 'profit' && functional.profit < functional.margin) {
+        decisionType = 'bad';
+        decisionHtml = `<div class="decision-badge bad"><span class="dot"></span>Objectif de marge non atteint</div>`;
+      } else {
+        decisionType = 'good';
+        decisionHtml = `<div class="decision-badge good"><span class="dot"></span>${decisionLabel}</div>`;
+      }
+    } else if (asIs) {
+      decisionLabel = "Revendre en l'état";
+      decisionHtml = `<div class="decision-badge neutral"><span class="dot"></span>${decisionLabel}</div>`;
     }
     $('decisionArea').innerHTML = decisionHtml;
 
@@ -739,28 +1002,33 @@
       name: $('itemName').value.trim() || 'Sans nom',
       type: state.type,
       condition: isRepair ? 'À réparer' : 'Fonctionnel',
-      max: chosen.max,
-      badDeal,
+      purchasePrice: chosen.purchasePrice,
+      resalePrice: chosen.resalePrice,
+      metric: primaryMetric(chosen),
+      value: chosen[primaryMetric(chosen)],
       decisionLabel,
       decisionType,
     };
   }
 
-  const sourcingItems = [];
+  /* ---------- Liste de sourcing ---------- */
+  const sourcingItems = loadJSON('sourcing', []);
 
   function renderTable() {
     const body = $('sourcingBody');
     $('listCount').textContent = `${sourcingItems.length} appareil${sourcingItems.length === 1 ? '' : 's'}`;
     if (sourcingItems.length === 0) {
-      body.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun appareil évalué pour l\'instant.</td></tr>';
+      body.innerHTML = '<tr class="empty-row"><td colspan="8">Aucun appareil évalué pour l\'instant.</td></tr>';
       return;
     }
     body.innerHTML = sourcingItems.map((item, i) => `
       <tr>
-        <td>${item.name}</td>
+        <td>${escapeHtml(item.name)}</td>
         <td><span class="type-pill">${item.type}</span></td>
         <td>${item.condition}</td>
-        <td class="num">${item.badDeal ? '—' : fmt.format(item.max)}</td>
+        <td class="num">${item.purchasePrice !== undefined ? fmt.format(item.purchasePrice) : '—'}</td>
+        <td class="num">${item.resalePrice !== undefined ? fmt.format(item.resalePrice) : '—'}</td>
+        <td class="num">${METRIC_TABLE_LABEL[item.metric]}&nbsp;${item.metric === 'maxPurchase' && item.value <= 0 ? '0 €' : fmt.format(item.value)}</td>
         <td><span class="decision-badge ${item.decisionType}"><span class="dot"></span>${item.decisionLabel}</span></td>
         <td><button type="button" class="icon-btn" aria-label="Retirer" data-idx="${i}">✕</button></td>
       </tr>
@@ -768,6 +1036,7 @@
     body.querySelectorAll('.icon-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         sourcingItems.splice(Number(btn.dataset.idx), 1);
+        saveJSON('sourcing', sourcingItems);
         renderTable();
       });
     });
@@ -776,9 +1045,11 @@
   $('addToList').addEventListener('click', () => {
     if (!lastResult) return;
     sourcingItems.unshift(lastResult);
+    saveJSON('sourcing', sourcingItems);
     renderTable();
   });
 
+  renderLibrary();
   compute();
   renderTable();
 </script>
