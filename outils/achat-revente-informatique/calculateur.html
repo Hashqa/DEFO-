@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cote de Reprise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --bg: #eaece9;
+    --surface: #ffffff;
+    --surface-2: #f5f6f4;
+    --ink: #1b1e1c;
+    --muted: #5c625e;
+    --border: #d5d9d5;
+    --accent: #bd6528;
+    --accent-ink: #ffffff;
+    --accent-soft: #f2e2d2;
+    --good: #3c7a52;
+    --good-soft: #e1eee4;
+    --bad: #b23a3a;
+    --bad-soft: #f5e1e1;
+    --neutral-dec: #3b6e8f;
+    --neutral-dec-soft: #dfeaf0;
+    --shadow: 0 1px 2px rgba(20, 20, 18, 0.06), 0 8px 24px -12px rgba(20, 20, 18, 0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141716;
+      --surface: #1d2120;
+      --surface-2: #232726;
+      --ink: #e9ece9;
+      --muted: #9ba39e;
+      --border: #2d3230;
+      --accent: #e08a46;
+      --accent-ink: #141716;
+      --accent-soft: #3a2a1c;
+      --good: #62c081;
+      --good-soft: #1e3323;
+      --bad: #e17878;
+      --bad-soft: #3b2222;
+      --neutral-dec: #7cb8db;
+      --neutral-dec-soft: #1e323d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #141716;
+    --surface: #1d2120;
+    --surface-2: #232726;
+    --ink: #e9ece9;
+    --muted: #9ba39e;
+    --border: #2d3230;
+    --accent: #e08a46;
+    --accent-ink: #141716;
+    --accent-soft: #3a2a1c;
+    --good: #62c081;
+    --good-soft: #1e3323;
+    --bad: #e17878;
+    --bad-soft: #3b2222;
+    --neutral-dec: #7cb8db;
+    --neutral-dec-soft: #1e323d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.25rem;
+  }
+
+  header.top .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  header.top h1 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  header.top .tag {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+  }
+
+  header.top p {
+    margin: 0;
+    max-width: 48ch;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  section.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-head h2 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+  }
+
+  .card-head .hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* --- Paramètres --- */
+  .params-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1.1rem;
+    padding: 1.3rem 1.4rem;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .field .unit-input {
+    position: relative;
+  }
+
+  .field input[type="number"],
+  .field input[type="text"] {
+    width: 100%;
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.98rem;
+    padding: 0.55rem 2.4rem 0.55rem 0.7rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .field input[type="text"] { font-family: "IBM Plex Sans", sans-serif; padding-right: 0.7rem; }
+
+  .field input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .field .unit-input .unit {
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.78rem;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  /* --- Bibliothèque de pièces --- */
+  .library-body {
+    padding: 1.1rem 1.4rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .library-add {
+    display: grid;
+    grid-template-columns: 1fr 130px auto auto;
+    gap: 0.6rem;
+    align-items: end;
+  }
+  @media (max-width: 720px) {
+    .library-add { grid-template-columns: 1fr 1fr; }
+    .library-add > button { grid-column: 1 / -1; }
+  }
+
+  .library-add > button {
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .library-add > button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .card-head-actions { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+
+  .library-items { display: flex; flex-direction: column; gap: 0.9rem; }
+  .library-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .library-group-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .library-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  .library-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.32rem 0.4rem 0.32rem 0.8rem;
+    font-size: 0.82rem;
+  }
+  .library-chip .chip-price {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+  .library-chip button {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+  .library-chip button:hover { color: var(--bad); }
+
+  .library-empty { color: var(--muted); font-size: 0.85rem; margin: 0; }
+
+  /* --- Main grid --- */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 880px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  .form-body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+
+  .segmented {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .segmented button {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+    border: none;
+    background: var(--surface-2);
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .segmented button + button { border-left: 1px solid var(--border); }
+  .segmented button[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .repair-block {
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    background: var(--surface-2);
+  }
+
+  .parts-list { display: flex; flex-direction: column; gap: 0.55rem; }
+  .part-row { display: grid; grid-template-columns: 1fr 120px auto auto; gap: 0.45rem; align-items: center; }
+  .part-row input[type="text"] { font-size: 0.9rem; padding: 0.45rem 0.6rem; }
+  .part-row input[type="number"] { font-size: 0.9rem; padding: 0.45rem 1.9rem 0.45rem 0.6rem; }
+
+  button.icon-btn {
+    width: 2rem;
+    height: 2rem;
+    flex: none;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button.icon-btn:hover { border-color: var(--bad); color: var(--bad); }
+  button.icon-btn.part-save:hover { border-color: var(--accent); color: var(--accent); }
+
+  button.add-part {
+    align-self: flex-start;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.4rem 0.7rem;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  button.add-part:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* --- Résultat --- */
+  .result-body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
+
+  .scenarios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .scenario {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    background: var(--surface-2);
+  }
+
+  .scenario-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .stat-block { display: flex; flex-direction: column; gap: 0.15rem; }
+  .stat-block .stat-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .stat-block.primary .stat-value {
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    text-wrap: balance;
+  }
+  .stat-block:not(.primary) .stat-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.98rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-value.bad { color: var(--bad); }
+  .stat-value.good { color: var(--good); }
+
+  .breakdown { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem; }
+  .breakdown .line {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .breakdown .line span:first-child { font-family: "IBM Plex Sans", sans-serif; color: var(--muted); }
+
+  .decision-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .decision-badge.good { background: var(--good-soft); color: var(--good); }
+  .decision-badge.bad { background: var(--bad-soft); color: var(--bad); }
+  .decision-badge.neutral { background: var(--neutral-dec-soft); color: var(--neutral-dec); }
+  .decision-badge .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: currentColor; }
+
+  .compare-note { font-size: 0.82rem; color: var(--muted); margin: 0.5rem 0 0; }
+
+  .primary-btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 0.7rem 1rem;
+    border-radius: 9px;
+    border: none;
+    background: var(--accent);
+    color: var(--accent-ink);
+    cursor: pointer;
+  }
+  .primary-btn:hover { filter: brightness(1.06); }
+  .primary-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* --- Table --- */
+  .table-wrap { overflow-x: auto; padding: 0.3rem 0.4rem 0.9rem; }
+  table.sourcing {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+    font-size: 0.88rem;
+  }
+  table.sourcing th {
+    text-align: left;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+  }
+  table.sourcing td {
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  table.sourcing td.num {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  table.sourcing tbody tr:hover { background: var(--surface-2); }
+  .type-pill {
+    font-size: 0.72rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+    color: var(--muted);
+  }
+  .empty-row td { color: var(--muted); text-align: center; padding: 1.6rem; font-size: 0.85rem; }
+
+  footer.note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    max-width: 72ch;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .primary-btn, button.icon-btn, button.add-part, .segmented button, .library-add button {
+      transition: filter 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <datalist id="partsLibraryList"></datalist>
+
+  <header class="top">
+    <div class="brand">
+      <h1>Cote de Reprise</h1>
+      <span class="tag">Achat &middot; Réparation &middot; Revente</span>
+    </div>
+    <p>Calcule le prix d'achat maximum ou le prix de revente minimum, le coût des pièces et la rentabilité d'un ordinateur ou d'une console — et si ça vaut le coup de le réparer.</p>
+  </header>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Paramètres de l'activité</h2>
+      <span class="hint">S'appliquent à toutes les évaluations ci-dessous</span>
+    </div>
+    <div class="params-grid">
+      <div class="field">
+        <label for="commission">Commission plateforme de vente</label>
+        <div class="unit-input">
+          <input type="number" id="commission" value="10" min="0" step="0.5" />
+          <span class="unit">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="shipping">Frais de port / emballage</label>
+        <div class="unit-input">
+          <input type="number" id="shipping" value="5" min="0" step="0.5" />
+          <span class="unit">€</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="laborRate">Taux horaire visé</label>
+        <div class="unit-input">
+          <input type="number" id="laborRate" value="15" min="0" step="0.5" />
+          <span class="unit">€/h</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="targetMargin">Marge minimum visée / appareil</label>
+        <div class="unit-input">
+          <input type="number" id="targetMargin" value="20" min="0" step="1" />
+          <span class="unit">€</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Bibliothèque de pièces</h2>
+      <div class="card-head-actions">
+        <span class="hint">Prix indicatifs (pièces génériques/compatibles), à ajuster selon vos fournisseurs</span>
+        <button type="button" class="add-part" id="libLoadDefaults">Recharger le catalogue par défaut</button>
+      </div>
+    </div>
+    <div class="library-body">
+      <div class="library-add">
+        <div class="field">
+          <label for="libName">Pièce</label>
+          <input type="text" id="libName" placeholder="ex. SSD 256 Go" />
+        </div>
+        <div class="field">
+          <label for="libPrice">Prix</label>
+          <div class="unit-input">
+            <input type="number" id="libPrice" min="0" step="0.5" placeholder="0" />
+            <span class="unit">€</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Catégorie</label>
+          <div class="segmented" id="libCategoryToggle">
+            <button type="button" data-value="Ordinateur" aria-pressed="true">Ordinateur</button>
+            <button type="button" data-value="Console" aria-pressed="false">Console</button>
+          </div>
+        </div>
+        <button type="button" id="libAdd">Enregistrer</button>
+      </div>
+      <div class="library-items" id="libraryList"></div>
+    </div>
+  </section>
+
+  <div class="main-grid">
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Évaluer un appareil</h2>
+      </div>
+      <div class="form-body">
+
+        <div class="row2">
+          <div class="field">
+            <label for="itemName">Modèle</label>
+            <input type="text" id="itemName" placeholder="ex. Switch OLED" />
+          </div>
+          <div class="field">
+            <label>Type</label>
+            <div class="segmented" id="typeToggle">
+              <button type="button" data-value="Ordinateur" aria-pressed="true">Ordinateur</button>
+              <button type="button" data-value="Console" aria-pressed="false">Console</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>État à l'achat</label>
+          <div class="segmented" id="stateToggle">
+            <button type="button" data-value="fonctionnel" aria-pressed="true">Fonctionnel</button>
+            <button type="button" data-value="reparer" aria-pressed="false">À réparer</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="purchasePrice">Prix d'achat (connu ou envisagé)</label>
+          <div class="unit-input">
+            <input type="number" id="purchasePrice" min="0" step="1" placeholder="optionnel" />
+            <span class="unit">€</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="resaleWorking">Prix de revente une fois fonctionnel</label>
+          <div class="unit-input">
+            <input type="number" id="resaleWorking" min="0" step="1" placeholder="optionnel" />
+            <span class="unit">€</span>
+          </div>
+        </div>
+
+        <div class="repair-block" id="repairBlock" hidden>
+          <div class="field">
+            <label>Pièces de réparation nécessaires</label>
+            <div class="parts-list" id="partsList"></div>
+            <button type="button" class="add-part" id="addPart">+ Ajouter une pièce</button>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="laborHours">Heures de réparation estimées</label>
+              <div class="unit-input">
+                <input type="number" id="laborHours" min="0" step="0.25" placeholder="0" />
+                <span class="unit">h</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="resaleAsIs">Prix de revente en l'état (sans réparer)</label>
+              <div class="unit-input">
+                <input type="number" id="resaleAsIs" min="0" step="1" placeholder="optionnel" />
+                <span class="unit">€</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="compare-note">Renseignez le prix de revente pour obtenir le prix d'achat maximum, le prix d'achat pour obtenir le prix de revente minimum — ou les deux pour voir le bénéfice réel.</p>
+
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Résultat</h2>
+      </div>
+      <div class="result-body">
+        <div class="scenarios" id="scenarios"></div>
+        <div id="decisionArea"></div>
+        <button type="button" class="primary-btn" id="addToList" disabled>Ajouter à la liste de sourcing</button>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Liste de sourcing</h2>
+      <span class="hint" id="listCount">0 appareil</span>
+    </div>
+    <div class="table-wrap">
+      <table class="sourcing">
+        <thead>
+          <tr>
+            <th>Modèle</th>
+            <th>Type</th>
+            <th>État</th>
+            <th>Achat</th>
+            <th>Revente</th>
+            <th>Résultat</th>
+            <th>Décision</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="sourcingBody">
+          <tr class="empty-row"><td colspan="8">Aucun appareil évalué pour l'instant.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="note">
+    Prix d'achat maximum = prix de revente &minus; commission &minus; frais de port &minus; pièces &minus; (heures × taux horaire) &minus; marge visée.
+    Prix de revente minimum = (prix d'achat + frais de port + pièces + main d'œuvre + marge visée) ÷ (1 &minus; commission).
+    Les paramètres, la bibliothèque de pièces et la liste de sourcing sont mémorisés dans ce navigateur (localStorage) — rien n'est envoyé ailleurs.
+  </footer>
+
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const fmt = new Intl.NumberFormat('fr-BE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 });
+  const num = (el) => { const v = parseFloat(el.value); return Number.isFinite(v) ? v : 0; };
+  const escapeHtml = (str) => String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const STORAGE_PREFIX = 'cote-de-reprise:';
+  function loadJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(STORAGE_PREFIX + key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+  function saveJSON(key, value) {
+    try { localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value)); } catch (e) { /* stockage indisponible */ }
+  }
+
+  const state = {
+    type: 'Ordinateur',
+    condition: 'fonctionnel',
+  };
+
+  /* ---------- Bibliothèque de pièces ---------- */
+  const DEFAULT_LIBRARY = [
+    { name: 'SSD SATA 256 Go', price: 25, category: 'Ordinateur' },
+    { name: 'SSD SATA 512 Go', price: 35, category: 'Ordinateur' },
+    { name: 'SSD NVMe 500 Go', price: 35, category: 'Ordinateur' },
+    { name: 'SSD NVMe 1 To', price: 55, category: 'Ordinateur' },
+    { name: 'Disque dur HDD 500 Go', price: 18, category: 'Ordinateur' },
+    { name: 'Disque dur HDD 1 To', price: 28, category: 'Ordinateur' },
+    { name: 'RAM DDR4 8 Go', price: 20, category: 'Ordinateur' },
+    { name: 'RAM DDR4 16 Go', price: 38, category: 'Ordinateur' },
+    { name: 'Écran portable 15.6" (dalle)', price: 45, category: 'Ordinateur' },
+    { name: 'Écran portable 13-14" (dalle)', price: 55, category: 'Ordinateur' },
+    { name: 'Batterie portable', price: 35, category: 'Ordinateur' },
+    { name: 'Chargeur secteur portable', price: 15, category: 'Ordinateur' },
+    { name: 'Clavier portable (nappe)', price: 22, category: 'Ordinateur' },
+    { name: 'Charnières écran (paire)', price: 15, category: 'Ordinateur' },
+    { name: 'Pâte thermique + nettoyage', price: 8, category: 'Ordinateur' },
+    { name: 'Ventilateur/dissipateur portable', price: 18, category: 'Ordinateur' },
+    { name: "Connecteur d'alimentation (DC jack)", price: 12, category: 'Ordinateur' },
+    { name: 'Joy-Con (unité)', price: 25, category: 'Console' },
+    { name: 'Kit réparation stick drift Joy-Con', price: 8, category: 'Console' },
+    { name: 'Écran Switch (dalle LCD)', price: 35, category: 'Console' },
+    { name: 'Vitre tactile Switch', price: 15, category: 'Console' },
+    { name: 'Batterie Switch', price: 15, category: 'Console' },
+    { name: 'Ventilateur Switch', price: 10, category: 'Console' },
+    { name: 'Manette PS4/Xbox (remplacement)', price: 35, category: 'Console' },
+    { name: 'Kit stick drift manette', price: 8, category: 'Console' },
+    { name: 'Lentille laser PS4/Xbox', price: 15, category: 'Console' },
+    { name: 'Alimentation PS4', price: 30, category: 'Console' },
+    { name: 'Lecteur disque Xbox One', price: 30, category: 'Console' },
+    { name: 'Pâte thermique console + nettoyage', price: 10, category: 'Console' },
+    { name: 'Câble HDMI', price: 6, category: 'Console' },
+  ];
+
+  let libCategory = 'Ordinateur';
+
+  let library;
+  {
+    let raw = null;
+    try { raw = localStorage.getItem(STORAGE_PREFIX + 'library'); } catch (e) { /* stockage indisponible */ }
+    if (raw) {
+      try { library = JSON.parse(raw); } catch (e) { library = DEFAULT_LIBRARY.slice(); }
+    } else {
+      library = DEFAULT_LIBRARY.slice();
+      saveJSON('library', library);
+    }
+  }
+
+  function renderLibrary() {
+    const list = $('libraryList');
+    if (library.length === 0) {
+      list.innerHTML = '<p class="library-empty">Aucune pièce enregistrée pour l\'instant.</p>';
+    } else {
+      const withIndex = library.map((item, i) => ({ ...item, i }));
+      list.innerHTML = ['Ordinateur', 'Console', 'Autre'].map((cat) => {
+        const items = withIndex.filter((item) => (item.category || 'Autre') === cat);
+        if (items.length === 0) return '';
+        return `
+          <div class="library-group">
+            <div class="library-group-title">${cat}</div>
+            <div class="library-chips">
+              ${items.map((item) => `
+                <span class="library-chip">
+                  ${escapeHtml(item.name)} <span class="chip-price">${fmt.format(item.price)}</span>
+                  <button type="button" data-idx="${item.i}" aria-label="Retirer ${escapeHtml(item.name)} de la bibliothèque">✕</button>
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    list.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        library.splice(Number(btn.dataset.idx), 1);
+        saveJSON('library', library);
+        renderLibrary();
+      });
+    });
+    $('partsLibraryList').innerHTML = library.map((item) => `<option value="${escapeHtml(item.name)}">`).join('');
+  }
+
+  function upsertLibrary(name, price, category) {
+    if (!name || !(price > 0)) return;
+    const existing = library.find((item) => item.name.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      existing.price = price;
+      if (category) existing.category = category;
+    } else {
+      library.push({ name, price, category: category || 'Autre' });
+    }
+    saveJSON('library', library);
+    renderLibrary();
+  }
+
+  setupSegmented('libCategoryToggle', (v) => { libCategory = v; });
+
+  $('libAdd').addEventListener('click', () => {
+    const name = $('libName').value.trim();
+    const price = num($('libPrice'));
+    if (!name || price <= 0) return;
+    upsertLibrary(name, price, libCategory);
+    $('libName').value = '';
+    $('libPrice').value = '';
+    $('libName').focus();
+  });
+
+  $('libLoadDefaults').addEventListener('click', () => {
+    DEFAULT_LIBRARY.forEach((def) => {
+      if (!library.some((item) => item.name.toLowerCase() === def.name.toLowerCase())) {
+        library.push({ ...def });
+      }
+    });
+    saveJSON('library', library);
+    renderLibrary();
+  });
+
+  /* ---------- Pièces de l'appareil évalué ---------- */
+  function addPartRow(name = '', price = '') {
+    const row = document.createElement('div');
+    row.className = 'part-row';
+    row.innerHTML = `
+      <input type="text" placeholder="ex. écran LCD" class="part-name" list="partsLibraryList" value="${escapeHtml(name)}" />
+      <div class="unit-input">
+        <input type="number" placeholder="0" min="0" step="0.5" class="part-price" value="${price}" />
+        <span class="unit">€</span>
+      </div>
+      <button type="button" class="icon-btn part-save" title="Enregistrer dans la bibliothèque" aria-label="Enregistrer cette pièce dans la bibliothèque">💾</button>
+      <button type="button" class="icon-btn part-remove" aria-label="Retirer la pièce">✕</button>
+    `;
+    $('partsList').appendChild(row);
+    const nameInput = row.querySelector('.part-name');
+    const priceInput = row.querySelector('.part-price');
+    nameInput.addEventListener('input', compute);
+    nameInput.addEventListener('change', () => {
+      const match = library.find((item) => item.name.toLowerCase() === nameInput.value.trim().toLowerCase());
+      if (match && !(num(priceInput) > 0)) {
+        priceInput.value = match.price;
+        compute();
+      }
+    });
+    priceInput.addEventListener('input', compute);
+    row.querySelector('.part-save').addEventListener('click', () => {
+      upsertLibrary(nameInput.value.trim(), num(priceInput), state.type);
+    });
+    row.querySelector('.part-remove').addEventListener('click', () => { row.remove(); compute(); });
+  }
+
+  function setupSegmented(id, onChange) {
+    const group = $(id);
+    group.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        onChange(btn.dataset.value);
+        compute();
+      });
+    });
+  }
+
+  setupSegmented('typeToggle', (v) => { state.type = v; });
+  setupSegmented('stateToggle', (v) => {
+    state.condition = v;
+    $('repairBlock').hidden = v !== 'reparer';
+  });
+
+  $('addPart').addEventListener('click', () => addPartRow());
+  addPartRow();
+
+  function partsTotal() {
+    return [...document.querySelectorAll('.part-price')].reduce((sum, el) => sum + num(el), 0);
+  }
+
+  /* ---------- Paramètres persistés ---------- */
+  const paramIds = ['commission', 'shipping', 'laborRate', 'targetMargin'];
+  const savedParams = loadJSON('params', null);
+  if (savedParams) paramIds.forEach((id) => { if (savedParams[id] !== undefined) $(id).value = savedParams[id]; });
+  function saveParams() {
+    const values = {};
+    paramIds.forEach((id) => { values[id] = $(id).value; });
+    saveJSON('params', values);
+  }
+
+  [...paramIds, 'purchasePrice', 'resaleWorking', 'laborHours', 'resaleAsIs', 'itemName'].forEach((id) => {
+    $(id).addEventListener('input', () => {
+      if (paramIds.includes(id)) saveParams();
+      compute();
+    });
+  });
+
+  /* ---------- Calcul ---------- */
+  function evaluatePath(resalePrice, purchasePrice, { includeRepair }) {
+    const commission = num($('commission')) / 100;
+    const shipping = num($('shipping'));
+    const margin = num($('targetMargin'));
+    const laborRate = num($('laborRate'));
+    const parts = includeRepair ? partsTotal() : 0;
+    const hours = includeRepair ? num($('laborHours')) : 0;
+    const labor = hours * laborRate;
+
+    const out = { commission, shipping, margin, parts, labor, hours };
+    if (resalePrice > 0) {
+      out.resalePrice = resalePrice;
+      out.commissionAmt = resalePrice * commission;
+      out.maxPurchase = resalePrice * (1 - commission) - shipping - parts - labor - margin;
+    }
+    if (purchasePrice > 0) {
+      out.purchasePrice = purchasePrice;
+      out.minResale = (purchasePrice + shipping + parts + labor + margin) / (1 - commission);
+    }
+    if (resalePrice > 0 && purchasePrice > 0) {
+      out.profit = resalePrice * (1 - commission) - shipping - parts - labor - purchasePrice;
+    }
+    return out;
+  }
+
+  function primaryMetric(path) {
+    if (path.profit !== undefined) return 'profit';
+    if (path.minResale !== undefined) return 'minResale';
+    if (path.maxPurchase !== undefined) return 'maxPurchase';
+    return null;
+  }
+
+  const METRIC_LABEL = {
+    profit: 'Bénéfice réel estimé',
+    minResale: 'Prix de revente minimum',
+    maxPurchase: "Prix d'achat maximum",
+  };
+  const METRIC_TABLE_LABEL = { profit: 'Bénéfice', minResale: 'Revente min', maxPurchase: 'Achat max' };
+
+  function statBlockHtml(key, path, primary) {
+    const value = path[key];
+    let display = fmt.format(value);
+    let cls = '';
+    if (key === 'maxPurchase' && value <= 0) { display = '0 €'; cls = 'bad'; }
+    if (key === 'profit') cls = value >= path.margin ? 'good' : 'bad';
+    return `
+      <div class="stat-block${primary ? ' primary' : ''}">
+        <span class="stat-label">${METRIC_LABEL[key]}</span>
+        <span class="stat-value ${cls}">${display}</span>
+      </div>
+    `;
+  }
+
+  function breakdownHtml(path) {
+    const lines = [];
+    if (path.resalePrice !== undefined) lines.push(['Prix de revente', path.resalePrice]);
+    if (path.purchasePrice !== undefined) lines.push(["− Prix d'achat", -path.purchasePrice]);
+    if (path.commissionAmt !== undefined) lines.push(['− Commission plateforme', -path.commissionAmt]);
+    lines.push(['− Frais de port', -path.shipping]);
+    if (path.parts > 0) lines.push(['− Pièces', -path.parts]);
+    if (path.labor > 0) lines.push(["− Main d'œuvre", -path.labor]);
+    if (path.profit === undefined) lines.push(['− Marge visée', -path.margin]);
+    else lines.push(['Marge visée (objectif)', path.margin]);
+    return `<div class="breakdown">${lines.map(([label, val]) => `
+      <div class="line"><span>${label}</span><span>${fmt.format(val)}</span></div>
+    `).join('')}</div>`;
+  }
+
+  function scenarioHtml(path, title) {
+    if (!path) return '';
+    const metric = primaryMetric(path);
+    const secondary = ['profit', 'minResale', 'maxPurchase'].filter((k) => k !== metric && path[k] !== undefined);
+    return `
+      <div class="scenario">
+        <div class="scenario-title">${title}</div>
+        ${statBlockHtml(metric, path, true)}
+        ${secondary.map((k) => statBlockHtml(k, path, false)).join('')}
+        ${breakdownHtml(path)}
+      </div>
+    `;
+  }
+
+  function compareScenarios(a, b) {
+    // Comparer seulement sur des prix de revente réels (estimés sur le marché) : comparer les
+    // prix de revente minimums serait trompeur, la version non réparée paraît toujours "meilleure"
+    // puisqu'elle évite simplement le coût des pièces, sans dire quoi que ce soit du marché réel.
+    if (a.profit !== undefined && b.profit !== undefined) {
+      const delta = Math.abs(a.profit - b.profit);
+      const winner = a.profit >= b.profit ? 'functional' : 'asIs';
+      return { winner, note: `${winner === 'functional' ? 'Réparer' : "Revendre en l'état"} rapporte ${fmt.format(delta)} de bénéfice réel en plus que l'autre option.` };
+    }
+    if (a.maxPurchase !== undefined && b.maxPurchase !== undefined) {
+      const delta = Math.abs(a.maxPurchase - b.maxPurchase);
+      const winner = a.maxPurchase >= b.maxPurchase ? 'functional' : 'asIs';
+      return { winner, note: `${winner === 'functional' ? 'Réparer' : "Revendre en l'état"} laisse ${fmt.format(delta)} de marge supplémentaire par rapport à l'autre option.` };
+    }
+    return null;
+  }
+
+  let lastResult = null;
+
+  function compute() {
+    const purchasePrice = num($('purchasePrice'));
+    const resaleWorking = num($('resaleWorking'));
+    const isRepair = state.condition === 'reparer';
+    const resaleAsIs = num($('resaleAsIs'));
+
+    const functional = (resaleWorking > 0 || purchasePrice > 0)
+      ? evaluatePath(resaleWorking, purchasePrice, { includeRepair: isRepair })
+      : null;
+    const asIs = (isRepair && (resaleAsIs > 0 || purchasePrice > 0))
+      ? evaluatePath(resaleAsIs, purchasePrice, { includeRepair: false })
+      : null;
+
+    if (!functional && !asIs) {
+      $('scenarios').innerHTML = '';
+      $('decisionArea').innerHTML = '<p class="compare-note">Renseignez un prix d\'achat et/ou un prix de revente pour commencer.</p>';
+      $('addToList').disabled = true;
+      lastResult = null;
+      return;
+    }
+
+    const functionalTitle = isRepair ? 'Après réparation' : 'Fonctionnel';
+    $('scenarios').innerHTML = scenarioHtml(functional, functionalTitle) + scenarioHtml(asIs, "En l'état (non réparé)");
+
+    let chosen = functional || asIs;
+    let decisionLabel = isRepair ? 'Réparer avant revente' : 'Revendre fonctionnel';
+    let decisionType = 'neutral';
+    let decisionHtml = '';
+
+    if (functional && asIs) {
+      const cmp = compareScenarios(functional, asIs);
+      if (cmp) {
+        chosen = cmp.winner === 'functional' ? functional : asIs;
+        decisionLabel = cmp.winner === 'functional' ? 'Réparer avant revente' : "Revendre en l'état — ne pas réparer";
+        decisionType = cmp.winner === 'functional' ? 'good' : 'neutral';
+        decisionHtml = `
+          <div class="decision-badge ${decisionType}"><span class="dot"></span>${decisionLabel}</div>
+          <p class="compare-note">${cmp.note}</p>
+        `;
+      } else {
+        decisionHtml = `<p class="compare-note">Ajoutez un prix de revente estimé (fonctionnel et/ou en l'état) pour comparer les deux options — sans ça, l'état non réparé demandera toujours un prix de revente minimum plus bas, ce qui ne dit rien de ce que le marché paiera réellement.</p>`;
+      }
+    } else if (functional) {
+      const metric = primaryMetric(functional);
+      if (metric === 'maxPurchase' && functional.maxPurchase <= 0) {
+        decisionType = 'bad';
+        decisionHtml = `<div class="decision-badge bad"><span class="dot"></span>Ne pas acheter à ce prix</div>`;
+      } else if (metric === 'profit' && functional.profit < functional.margin) {
+        decisionType = 'bad';
+        decisionHtml = `<div class="decision-badge bad"><span class="dot"></span>Objectif de marge non atteint</div>`;
+      } else {
+        decisionType = 'good';
+        decisionHtml = `<div class="decision-badge good"><span class="dot"></span>${decisionLabel}</div>`;
+      }
+    } else if (asIs) {
+      decisionLabel = "Revendre en l'état";
+      decisionHtml = `<div class="decision-badge neutral"><span class="dot"></span>${decisionLabel}</div>`;
+    }
+    $('decisionArea').innerHTML = decisionHtml;
+
+    $('addToList').disabled = false;
+    lastResult = {
+      name: $('itemName').value.trim() || 'Sans nom',
+      type: state.type,
+      condition: isRepair ? 'À réparer' : 'Fonctionnel',
+      purchasePrice: chosen.purchasePrice,
+      resalePrice: chosen.resalePrice,
+      metric: primaryMetric(chosen),
+      value: chosen[primaryMetric(chosen)],
+      decisionLabel,
+      decisionType,
+    };
+  }
+
+  /* ---------- Liste de sourcing ---------- */
+  const sourcingItems = loadJSON('sourcing', []);
+
+  function renderTable() {
+    const body = $('sourcingBody');
+    $('listCount').textContent = `${sourcingItems.length} appareil${sourcingItems.length === 1 ? '' : 's'}`;
+    if (sourcingItems.length === 0) {
+      body.innerHTML = '<tr class="empty-row"><td colspan="8">Aucun appareil évalué pour l\'instant.</td></tr>';
+      return;
+    }
+    body.innerHTML = sourcingItems.map((item, i) => `
+      <tr>
+        <td>${escapeHtml(item.name)}</td>
+        <td><span class="type-pill">${item.type}</span></td>
+        <td>${item.condition}</td>
+        <td class="num">${item.purchasePrice !== undefined ? fmt.format(item.purchasePrice) : '—'}</td>
+        <td class="num">${item.resalePrice !== undefined ? fmt.format(item.resalePrice) : '—'}</td>
+        <td class="num">${METRIC_TABLE_LABEL[item.metric]}&nbsp;${item.metric === 'maxPurchase' && item.value <= 0 ? '0 €' : fmt.format(item.value)}</td>
+        <td><span class="decision-badge ${item.decisionType}"><span class="dot"></span>${item.decisionLabel}</span></td>
+        <td><button type="button" class="icon-btn" aria-label="Retirer" data-idx="${i}">✕</button></td>
+      </tr>
+    `).join('');
+    body.querySelectorAll('.icon-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        sourcingItems.splice(Number(btn.dataset.idx), 1);
+        saveJSON('sourcing', sourcingItems);
+        renderTable();
+      });
+    });
+  }
+
+  $('addToList').addEventListener('click', () => {
+    if (!lastResult) return;
+    sourcingItems.unshift(lastResult);
+    saveJSON('sourcing', sourcingItems);
+    renderTable();
+  });
+
+  renderLibrary();
+  compute();
+  renderTable();
+</script>
+</body>
+</html>
