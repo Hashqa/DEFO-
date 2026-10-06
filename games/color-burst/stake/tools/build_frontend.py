@@ -473,6 +473,12 @@ function startGrid(){
 
 sub("function buildValues(){\n  const b=bet(), n = v => fmtPay(v*b);", "function buildValues(){\n  const b=bet(), n = v => { const x=v*b, m=CURRENCY?(CUR_META[CURRENCY]||[0,2]):[0,2]; return sp(x.toLocaleString(LOCALE,{minimumFractionDigits:x<100?m[1]:0,maximumFractionDigits:x<100?m[1]:0})); };")
 
+# ------------------------------------------------------------------ corrections de la revue Engine
+import importlib.util
+_spec = importlib.util.spec_from_file_location('stake_fixes', os.path.join(HERE, 'stake_fixes.py'))
+_fx = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_fx)
+s = _fx.apply(s)
+
 # ------------------------------------------------------------------ écriture
 os.makedirs(OUT, exist_ok=True)
 open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(s)
@@ -480,4 +486,7 @@ shutil.copy(os.path.join(GAME, 'stake', 'engine.js'), os.path.join(OUT, 'engine.
 dst = os.path.join(OUT, 'theme', 'halloween')
 if os.path.exists(dst): shutil.rmtree(dst)
 shutil.copytree(os.path.join(GAME, 'theme', 'halloween'), dst)
+fdst = os.path.join(OUT, 'theme', 'fonts')
+if os.path.exists(fdst): shutil.rmtree(fdst)
+shutil.copytree(os.path.join(GAME, 'stake', 'fonts'), fdst)
 print('front-end écrit dans', OUT)

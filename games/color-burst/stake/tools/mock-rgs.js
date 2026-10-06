@@ -46,7 +46,7 @@ http.createServer((req, res) => {
   if (req.method === 'GET') {
     const f = path.join(FRONT, decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname));
     if (!f.startsWith(FRONT) || !fs.existsSync(f)) { res.writeHead(404); return res.end(); }
-    const ext = path.extname(f), type = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.mp3': 'audio/mpeg' }[ext] || 'application/octet-stream';
+    const ext = path.extname(f), type = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.mp3': 'audio/mpeg', '.woff2': 'font/woff2' }[ext] || 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': type }); return fs.createReadStream(f).pipe(res);
   }
   let body = ''; req.on('data', c => body += c); req.on('end', () => {
