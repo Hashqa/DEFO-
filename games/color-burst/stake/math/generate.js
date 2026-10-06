@@ -72,9 +72,9 @@ function computeWeights(rounds, cost, capProbWanted) {
 }
 
 function stats(rounds, weights, cost) {
-  let W = 0, P = 0, hit = 0, lessBet = 0, p5k = 0, p10k = 0, pmax = 0, max = 0, e40 = 0, e10k = 0;
-  rounds.forEach((r, i) => { const w = weights[i], x = r.payoutX; W += w; P += w * x; if (x > 0) hit += w; if (x < cost) lessBet += w; if (x / cost >= 5000) p5k += w; if (x / cost >= 10000) p10k += w; if (r.criteria === 'wincap') pmax += w; if (x > max) max = x; if (x >= 40 * cost) e40 += w * x; if (x >= 10000) e10k += w * x; });
-  return { rtp: P / W / cost, hitRate: hit / W, probLessThanBet: lessBet / W, prob5k: p5k / W, prob10k: p10k / W, etl40b: e40 / W, etl10k: e10k / W, maxWinHitRate: pmax / W, maxWin: max };
+  let trig = 0, W = 0, P = 0, hit = 0, lessBet = 0, p5k = 0, p10k = 0, pmax = 0, max = 0, e40 = 0, e10k = 0;
+  rounds.forEach((r, i) => { const w = weights[i], x = r.payoutX; W += w; P += w * x; if (cost === 1 && r.freeGameWins > 0) trig += w; if (x > 0) hit += w; if (x < cost) lessBet += w; if (x / cost >= 5000) p5k += w; if (x / cost >= 10000) p10k += w; if (r.criteria === 'wincap') pmax += w; if (x > max) max = x; if (x >= 40 * cost) e40 += w * x; if (x >= 10000) e10k += w * x; });
+  return { rtp: P / W / cost, bonusUnSur: trig ? +(W / trig).toFixed(1) : null, hitRate: hit / W, probLessThanBet: lessBet / W, prob5k: p5k / W, prob10k: p10k / W, etl40b: e40 / W, etl10k: e10k / W, maxWinHitRate: pmax / W, maxWin: max };
 }
 
 function verify(file, lutFile) {

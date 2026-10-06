@@ -398,6 +398,7 @@ body.lite::before,body.lite::after{transition:none}
     <radialGradient id="hgPotion" cx="40%" cy="40%" r="70%"><stop offset="0" stop-color="#ffc2e6"/><stop offset=".5" stop-color="#ff3fa4"/><stop offset="1" stop-color="#9c0f5c"/></radialGradient>
     <radialGradient id="hgMoon" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffb3a1"/><stop offset=".45" stop-color="#ff2a2a"/><stop offset="1" stop-color="#7a0010"/></radialGradient>
 
+    <radialGradient id="hgSpider" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#fff2a8"/><stop offset=".5" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86400"/></radialGradient>
     <g id="hw0"><!-- chaudron -->
       <rect x="22" y="80" width="8" height="12" rx="3" fill="#0c0a14"/><rect x="70" y="80" width="8" height="12" rx="3" fill="#0c0a14"/>
       <path d="M12 44 Q10 84 36 90 L64 90 Q90 84 88 44 Z" fill="url(#hgPot)" stroke="#05040a" stroke-width="3"/>
@@ -443,11 +444,18 @@ body.lite::before,body.lite::after{transition:none}
       <circle cx="40" cy="72" r="4" fill="#ffd1ec"/><circle cx="56" cy="78" r="3" fill="#ffd1ec"/><circle cx="62" cy="68" r="2" fill="#ffd1ec"/>
       <path d="M28 52 Q30 44 38 42" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>
     </g>
-    <g id="hw6"><!-- bonbon -->
-      <path d="M24 66 L76 66 L88 88 Q90 92 84 92 L16 92 Q10 92 12 88 Z" fill="#ffd23f" stroke="#b38600" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M37 38 L63 38 L76 66 L24 66 Z" fill="#ff8c1a" stroke="#b34700" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M46 12 Q50 6 54 12 L63 38 L37 38 Z" fill="#fff8ec" stroke="#b9ad99" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M40 30 L44 18" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <g id="hw6"><!-- araignée -->
+      <path d="M50 2 V24" stroke="#d9d2ff" stroke-width="1.6" opacity=".8"/>
+      <g fill="none" stroke="#2a1240" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M41 40 L22 24 L9 34"/><path d="M39 48 L16 42 L5 55"/><path d="M39 57 L17 63 L8 78"/><path d="M42 65 L25 79 L19 94"/>
+        <path d="M59 40 L78 24 L91 34"/><path d="M61 48 L84 42 L95 55"/><path d="M61 57 L83 63 L92 78"/><path d="M58 65 L75 79 L81 94"/>
+      </g>
+      <ellipse cx="50" cy="64" rx="22" ry="24" fill="url(#hgSpider)" stroke="#6b4200" stroke-width="3"/>
+      <path d="M50 48 L58 58 L50 66 L42 58 Z M50 70 L56 78 L50 84 L44 78 Z" fill="#3a1a00" opacity=".75"/>
+      <circle cx="50" cy="35" r="13" fill="url(#hgSpider)" stroke="#6b4200" stroke-width="3"/>
+      <circle cx="44" cy="34" r="4.2" fill="#1a1020"/><circle cx="56" cy="34" r="4.2" fill="#1a1020"/><circle cx="47" cy="27" r="2.2" fill="#1a1020"/><circle cx="53" cy="27" r="2.2" fill="#1a1020"/>
+      <circle cx="45.3" cy="32.6" r="1.3" fill="#fff"/><circle cx="57.3" cy="32.6" r="1.3" fill="#fff"/>
+      <ellipse cx="40" cy="54" rx="7" ry="4" transform="rotate(-40 40 54)" fill="#fff" opacity=".55"/>
     </g>
     <g id="hw7"><!-- lune de sang (Bonus) -->
       <circle cx="50" cy="50" r="46" fill="none" stroke="#ff4d4d" stroke-opacity=".45" stroke-width="2" stroke-dasharray="5 6"/>
@@ -674,7 +682,7 @@ const THEMES = {
   },
   halloween: {
     label:'Halloween', logo:['SPOOKY','BURST'], prefix:'hw',
-    names:['Chaudron','Citrouille','Crâne','Fantôme','Chauve-souris','Potion','Bonbon','Lune de sang'],
+    names:['Chaudron','Citrouille','Crâne','Fantôme','Chauve-souris','Potion','Araignée','Lune de sang'],
     colors:['#39ff6a','#ff8c1a','#e8e2d0','#c9b8ff','#8b5cf6','#ff3fa4','#ffd23f','#ff2a2a'],
     synthMusic:true
   }

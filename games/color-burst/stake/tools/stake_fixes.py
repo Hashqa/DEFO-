@@ -160,62 +160,62 @@ let SOC = Q.get('social') === 'true';          // aussi activé par config.juris
 /* Vocabulaire neutre partout (pas de « pays/paid/payouts/money/gambling ») ; « bet/buy » seulement hors mode social. */
 function makeT(soc){
   const en = {
-    balance:'Balance', bet: soc?'Play amount':'Bet', buy:'Bonus', buyD:'10+ free spins, persistent multipliers.', sup:'Super bonus', supD:'10+ free spins, every cell starts at <b>x2</b>.',
+    balance:'Balance', bet: soc?'Play amount':'Bet', buy:'Bonus', buyD:'8+ free spins, persistent multipliers.', sup:'Super bonus', supD:`8+ free spins, ${CFG.MODES.super.startCells} cells start at <b>x${CFG.MODES.super.startValue}</b>.`,
     pay:'Symbol values', paySub:'By cluster size, for', max:'Max win:', speed:'Speed', note:'Theoretical RTP '+RTP_TEXT+'.', fsWin:'Bonus total', heat:'Multipliers in play',
     hint:'Form clusters of 5 or more matching symbols.', luck:'Good luck…', nowin:'No cluster this time.', win:'Win', nice:'NICE WIN!', big:'BIG WIN!', huge:'HUGE!', bonusDone:'Bonus complete!',
     left:n=>n+' left', trig:'Bonus triggered', bought:'Bonus started', spins:n=>n+' FREE SPINS',
-    intro:n=>n+' Bonus symbols. Multipliers stay on the grid for the whole bonus and keep doubling.', introSup:'<b>Super bonus:</b> all 49 cells start at x2.', start:'Start',
+    intro:n=>n+' Bonus symbols. Multipliers stay on the grid for the whole bonus and keep climbing.', introSup:`<b>Super bonus:</b> ${CFG.MODES.super.startCells} cells start at x${CFG.MODES.super.startValue}.`, start:'Start',
     retrig:'Retrigger', over:'Bonus complete', maxed:'Max win reached', inSpins:n=>'in '+n+' free spin'+(n>1?'s':''), cont:'Continue',
-    confirm:(b,sup)=>(soc?'For a play amount of ':'For a bet of ')+b+', you get <b>10 or more free spins</b>'+(sup?', with <b>every cell at x2</b> from the start':'')+'.', cancel:'Cancel', buyBtn: soc?'Start':'Buy',
+    confirm:(b,sup)=>(soc?'For a play amount of ':'For a bet of ')+b+', you get <b>8 or more free spins</b>'+(sup?`, with <b>${CFG.MODES.super.startCells} cells at x${CFG.MODES.super.startValue}</b> from the start`:'')+'.', cancel:'Cancel', buyBtn: soc?'Start':'Buy',
     cascade:n=>'CASCADE ×'+n, skip:'Tap to skip', tapCont:'Tap to continue', tiers:['BIG WIN','MEGA WIN','EPIC WIN','LEGENDARY'], best:'(best)', symbol:'Symbol',
     replayDone:'Replay complete', replayAgain:'Watch again', replayPlay:'Play', replayWin:x=>'Win: '+x, replayBanner:(m,b,c)=>m+' · '+(soc?'play amount ':'bet ')+b+(c?' · cost '+c:''), modeName:{base:'Base game',bonus:'Bonus',super:'Super bonus'},
     session:'Session', net:'Net', loading:'Loading…', noSession:'This game must be opened from the casino.',
     music:'Music', musicOn:'Turn music on', musicOff:'Turn music off', soundOn:'Turn sound on', soundOff:'Turn sound off', rulesTip:'Game rules', spinAria:'Spin', stopAuto:n=>'Stop autoplay ('+n+')',
     autoAsk:n=>'Start autoplay for '+n+' spins?', autoStart:'Start autoplay', dec:'Decrease', inc:'Increase',
     err:{ ERR_IPB:'Insufficient balance.', ERR_IS:'Your session has expired. Please reload the game.', ERR_ATE:'Authentication failed. Please reload the game.', ERR_GLE: soc?'Play limit reached.':'Limit reached.', ERR_LOC:'This game is not available in your location.', ERR_MAINTENANCE:'The game is under maintenance. Please try again later.', def:'Connection problem. Please try again.' },
-    controls:[['Spin button','Starts a spin. During autoplay it shows the spins left; tap it to stop.'],['− / +',(soc?'Lowers or raises the play amount.':'Lowers or raises the bet.')],['Auto','Choose a number of automatic spins, then confirm to start.'],['Turbo','Speeds up the animations.'],['Bonus',(soc?'Starts the bonus':'Buys the bonus')+' for 100× the '+(soc?'play amount':'bet')+'.'],['Super bonus',(soc?'Starts the super bonus':'Buys the super bonus')+' for 300× the '+(soc?'play amount':'bet')+'; every cell starts at x2.'],['♪','Turns the music on or off.'],['Speaker','Turns all sound on or off.'],['?','Opens these rules.'],['Space','Starts a spin (when allowed).']],
+    controls:[['Spin button','Starts a spin. During autoplay it shows the spins left; tap it to stop.'],['− / +',(soc?'Lowers or raises the play amount.':'Lowers or raises the bet.')],['Auto','Choose a number of automatic spins, then confirm to start.'],['Turbo','Speeds up the animations.'],['Bonus',(soc?'Starts the bonus':'Buys the bonus')+' for 100× the '+(soc?'play amount':'bet')+'.'],['Super bonus',(soc?'Starts the super bonus':'Buys the super bonus')+' for 300× the '+(soc?'play amount':'bet')+`; ${CFG.MODES.super.startCells} random cells start at x${CFG.MODES.super.startValue}.`],['♪','Turns the music on or off.'],['Speaker','Turns all sound on or off.'],['?','Opens these rules.'],['Space','Starts a spin (when allowed).']],
     rules:(f)=>`<h2>Rules</h2>
       <p>7 × 7 grid. A cluster of <b>5 or more matching symbols</b>, connected horizontally or vertically, awards a win according to its size. Values below are for your current ${soc?'play amount':'bet'} of <b>${f.bet}</b>; each extra symbol in a cluster wins more, up to 15+.</p>
       ${f.table}
       <h3>Tumbles</h3><p>Winning symbols explode, the symbols above fall down and new ones drop in. Tumbles continue as long as new clusters form.</p>
-      <h3>Multiplier spots</h3><ul><li>When a winning symbol explodes on a cell, the cell becomes <b>x2</b>.</li><li>Each further explosion on that cell doubles it: x4, x8, x16… up to x${MAX_MULT}.</li><li>A cluster on multiplier cells adds their values together (x4 + x8 = ×12) and multiplies its win.</li><li>In the base game the cells reset every spin. During free spins they stay until the end of the bonus.</li></ul>
+      <h3>Multiplier spots</h3><ul><li>When a winning symbol explodes on a cell, the cell becomes <b>x2</b>.</li><li>Each further explosion on that cell raises it one step: ${CFG.MULT_LADDER.map(v=>'x'+v).join(' → ')}. x${MAX_MULT} is the maximum.</li><li>A cluster on multiplier cells adds their values together (x3 + x10 = ×13) and multiplies its win.</li><li>In the base game the cells reset every spin. During free spins they stay until the end of the bonus.</li></ul>
       ${f.ladder}
-      <h3>Free spins</h3><p>${f.scatter} 3 Bonus symbols = 10 spins · 4 = 12 · 5 = 15 · 6 = 20 · 7+ = 30. During the bonus, 3 or more Bonus symbols award ${RETRIGGER} extra spins. A bonus always wins at least ${MIN_BONUS_X}× the ${soc?'play amount':'bet'}.</p>
+      <h3>Free spins</h3><p>${f.scatter} Bonus symbols anywhere on the grid, counted when the tumbles are over: 3 = ${CFG.FS_AWARD[3]} spins · 4 = ${CFG.FS_AWARD[4]} · 5 = ${CFG.FS_AWARD[5]} · 6 = ${CFG.FS_AWARD[6]} · 7+ = ${CFG.FS_AWARD[7]}. During the bonus, 3 or more Bonus symbols award ${RETRIGGER} extra spins. A bonus always wins at least ${MIN_BONUS_X}× the ${soc?'play amount':'bet'}.</p>
       ${f.buy}
       <h3>Max win</h3><p>Wins are capped at <b>${MAX_WIN_X.toLocaleString('en-US')}× the ${soc?'play amount':'bet'}</b> (${f.maxwin}). When it is reached, the round ends and the max win is awarded.</p>
       <h3>Return to player</h3><p>The theoretical RTP is <b>${RTP_TEXT}</b> for the base game, the Bonus and the Super bonus.</p>
       <h3>Controls</h3><div class="ctrl-list">${f.controls}</div>
-      <h3>Disclaimer</h3><p style="color:var(--mute);font-size:13px">A malfunction voids all wins and plays. A stable internet connection is required; if the connection is lost, reload the game to complete an unfinished round. The RTP is a theoretical value calculated over a very large number of rounds. All results are determined by the server; animations and displayed values are for illustration only. Spooky Burst™ © ${new Date().getFullYear()} KPOS. All rights reserved.</p>`,
-    rulesBuy:(a,b)=>`<h3>Bonus and Super bonus</h3><p>Bonus: ${a} (100× the ${soc?'play amount':'bet'}). Super bonus, all cells start at x2: ${b} (300× the ${soc?'play amount':'bet'}).</p>`, close:'Close'
+      <h3>Disclaimer</h3><p style="color:var(--mute);font-size:13px">A malfunction voids all wins and plays. A stable internet connection is required; if the connection is lost, reload the game to complete an unfinished round. The RTP is a theoretical value calculated over a very large number of rounds. The game display is not representative of any physical device and is for illustrative purposes only. Winnings are settled according to the amount received from the Remote Game Server and not from events within the web browser. Spooky Burst™ © ${new Date().getFullYear()} KPOS. All rights reserved.</p>`,
+    rulesBuy:(a,b)=>`<h3>Bonus and Super bonus</h3><p>Bonus: ${a} (100× the ${soc?'play amount':'bet'}). Super bonus, ${CFG.MODES.super.startCells} random cells start at x${CFG.MODES.super.startValue}: ${b} (300× the ${soc?'play amount':'bet'}).</p>`, close:'Close'
   };
   const fr = {
-    balance:'Solde', bet: soc?'Montant':'Mise', buy:'Bonus', buyD:'10 free spins ou plus, multiplicateurs persistants.', sup:'Super bonus', supD:'10 free spins ou plus, toutes les cases démarrent à <b>x2</b>.',
+    balance:'Solde', bet: soc?'Montant':'Mise', buy:'Bonus', buyD:'8 free spins ou plus, multiplicateurs persistants.', sup:'Super bonus', supD:`8 free spins ou plus, ${CFG.MODES.super.startCells} cases démarrent à <b>x${CFG.MODES.super.startValue}</b>.`,
     pay:'Valeur des symboles', paySub:'Selon la taille du groupe, pour', max:'Gain max :', speed:'Vitesse', note:'Taux de retour théorique '+RTP_TEXT.replace('.',',')+'.', fsWin:'Total du bonus', heat:'Multiplicateurs en jeu',
     hint:'Formez des groupes de 5 symboles identiques ou plus.', luck:'Bonne chance…', nowin:'Pas de groupe cette fois.', win:'Gain', nice:'JOLI GAIN !', big:'GROS GAIN !', huge:'ÉNORME !', bonusDone:'Bonus terminé !',
     left:n=>n+' restant'+(n>1?'s':''), trig:'Bonus déclenché', bought:'Bonus lancé', spins:n=>n+' FREE SPINS',
-    intro:n=>n+' symboles Bonus. Pendant tout le bonus, les multiplicateurs <b>restent en place</b> et continuent de doubler.', introSup:'<b>Super bonus :</b> les 49 cases démarrent déjà à x2.', start:'Commencer',
+    intro:n=>n+' symboles Bonus. Pendant tout le bonus, les multiplicateurs <b>restent en place</b> et continuent de grimper.', introSup:`<b>Super bonus :</b> ${CFG.MODES.super.startCells} cases démarrent déjà à x${CFG.MODES.super.startValue}.`, start:'Commencer',
     retrig:'Relance', over:'Bonus terminé', maxed:'Gain maximum atteint', inSpins:n=>'en '+n+' free spin'+(n>1?'s':''), cont:'Continuer',
-    confirm:(b,sup)=>(soc?'Pour un montant de ':'Pour une mise de ')+b+', vous obtenez <b>10 free spins</b> ou plus'+(sup?', avec <b>toutes les cases à x2</b> dès le départ':'')+'.', cancel:'Annuler', buyBtn: soc?'Lancer':'Acheter',
+    confirm:(b,sup)=>(soc?'Pour un montant de ':'Pour une mise de ')+b+', vous obtenez <b>8 free spins</b> ou plus'+(sup?`, avec <b>${CFG.MODES.super.startCells} cases à x${CFG.MODES.super.startValue}</b> dès le départ`:'')+'.', cancel:'Annuler', buyBtn: soc?'Lancer':'Acheter',
     cascade:n=>'CASCADE ×'+n, skip:'Touchez pour passer', tapCont:'Touchez pour continuer', tiers:['BIG WIN','MEGA WIN','EPIC WIN','LÉGENDAIRE'], best:'(meilleur)', symbol:'Symbole',
     replayDone:'Rejeu terminé', replayAgain:'Revoir', replayPlay:'Lancer', replayWin:x=>'Gain : '+x, replayBanner:(m,b,c)=>m+' · '+(soc?'montant ':'mise ')+b+(c?' · coût '+c:''), modeName:{base:'Jeu de base',bonus:'Bonus',super:'Super bonus'},
     session:'Session', net:'Net', loading:'Chargement…', noSession:'Ce jeu doit être ouvert depuis le casino.',
     music:'Musique', musicOn:'Activer la musique', musicOff:'Couper la musique', soundOn:'Activer le son', soundOff:'Couper le son', rulesTip:'Règles du jeu', spinAria:'Lancer', stopAuto:n=>'Arrêter l’auto ('+n+')',
     autoAsk:n=>'Lancer '+n+' spins automatiques ?', autoStart:'Lancer l’auto', dec:'Diminuer', inc:'Augmenter',
     err:{ ERR_IPB:'Solde insuffisant.', ERR_IS:'Votre session a expiré. Rechargez le jeu.', ERR_ATE:'Échec de l’authentification. Rechargez le jeu.', ERR_GLE:'Limite atteinte.', ERR_LOC:'Ce jeu n’est pas disponible dans votre pays.', ERR_MAINTENANCE:'Le jeu est en maintenance. Réessayez plus tard.', def:'Problème de connexion. Réessayez.' },
-    controls:[['Bouton de lancement','Lance un spin. En automatique, il affiche les spins restants ; touchez-le pour arrêter.'],['− / +',(soc?'Diminue ou augmente le montant.':'Diminue ou augmente la mise.')],['Auto','Choisissez un nombre de spins automatiques, puis confirmez pour lancer.'],['Turbo','Accélère les animations.'],['Bonus',(soc?'Lance le bonus':'Achète le bonus')+' pour 100 fois '+(soc?'le montant':'la mise')+'.'],['Super bonus',(soc?'Lance le super bonus':'Achète le super bonus')+' pour 300 fois '+(soc?'le montant':'la mise')+' ; toutes les cases démarrent à x2.'],['♪','Active ou coupe la musique.'],['Haut-parleur','Active ou coupe tous les sons.'],['?','Ouvre ces règles.'],['Espace','Lance un spin (si autorisé).']],
+    controls:[['Bouton de lancement','Lance un spin. En automatique, il affiche les spins restants ; touchez-le pour arrêter.'],['− / +',(soc?'Diminue ou augmente le montant.':'Diminue ou augmente la mise.')],['Auto','Choisissez un nombre de spins automatiques, puis confirmez pour lancer.'],['Turbo','Accélère les animations.'],['Bonus',(soc?'Lance le bonus':'Achète le bonus')+' pour 100 fois '+(soc?'le montant':'la mise')+'.'],['Super bonus',(soc?'Lance le super bonus':'Achète le super bonus')+' pour 300 fois '+(soc?'le montant':'la mise')+` ; ${CFG.MODES.super.startCells} cases au hasard démarrent à x${CFG.MODES.super.startValue}.`],['♪','Active ou coupe la musique.'],['Haut-parleur','Active ou coupe tous les sons.'],['?','Ouvre ces règles.'],['Espace','Lance un spin (si autorisé).']],
     rules:(f)=>`<h2>Règles</h2>
       <p>Grille de 7 × 7. Un groupe de <b>5 symboles identiques ou plus</b>, reliés horizontalement ou verticalement, rapporte un gain selon sa taille. Le tableau donne les valeurs pour ${soc?'votre montant actuel':'votre mise actuelle'} de <b>${f.bet}</b> : chaque symbole en plus rapporte davantage, jusqu'à 15 et plus.</p>
       ${f.table}
       <h3>Cascades</h3><p>Les symboles gagnants explosent, ceux du dessus tombent et de nouveaux arrivent. Tant qu'un groupe se forme, ça continue.</p>
-      <h3>Cases multiplicatrices</h3><ul><li>Dès qu'un symbole gagnant explose sur une case, elle devient <b>x2</b>.</li><li>Chaque nouvelle explosion la double : x4, x8, x16… jusqu'à x${MAX_MULT}.</li><li>Un groupe posé sur des cases multiplicatrices additionne leurs valeurs (x4 + x8 = ×12) et multiplie son gain.</li><li>En jeu de base, la grille se vide à chaque spin. En free spins, les cases restent jusqu'à la fin du bonus.</li></ul>
+      <h3>Cases multiplicatrices</h3><ul><li>Dès qu'un symbole gagnant explose sur une case, elle devient <b>x2</b>.</li><li>Chaque nouvelle explosion la fait monter d'un cran : ${CFG.MULT_LADDER.map(v=>'x'+v).join(' → ')}. x${MAX_MULT} est le maximum.</li><li>Un groupe posé sur des cases multiplicatrices additionne leurs valeurs (x3 + x10 = ×13) et multiplie son gain.</li><li>En jeu de base, la grille se vide à chaque spin. En free spins, les cases restent jusqu'à la fin du bonus.</li></ul>
       ${f.ladder}
-      <h3>Free spins</h3><p>${f.scatter} 3 Bonus = 10 spins · 4 = 12 · 5 = 15 · 6 = 20 · 7+ = 30. Pendant le bonus, 3 Bonus ou plus ajoutent ${RETRIGGER} spins. Un bonus rapporte toujours au moins ${MIN_BONUS_X} fois ${soc?'le montant':'la mise'}.</p>
+      <h3>Free spins</h3><p>${f.scatter} Symboles Bonus n'importe où sur la grille, comptés à la fin des cascades : 3 = ${CFG.FS_AWARD[3]} spins · 4 = ${CFG.FS_AWARD[4]} · 5 = ${CFG.FS_AWARD[5]} · 6 = ${CFG.FS_AWARD[6]} · 7+ = ${CFG.FS_AWARD[7]}. Pendant le bonus, 3 Bonus ou plus ajoutent ${RETRIGGER} spins. Un bonus rapporte toujours au moins ${MIN_BONUS_X} fois ${soc?'le montant':'la mise'}.</p>
       ${f.buy}
       <h3>Gain maximum</h3><p>Les gains sont plafonnés à <b>${MAX_WIN_X.toLocaleString('fr-FR')} fois ${soc?'le montant':'la mise'}</b> (${f.maxwin}). Dès qu'il est atteint, la partie s'arrête et le gain maximum est accordé.</p>
       <h3>Taux de retour</h3><p>Le taux de retour théorique est de <b>${RTP_TEXT.replace('.',',')}</b> pour le jeu de base, le Bonus et le Super bonus.</p>
       <h3>Commandes</h3><div class="ctrl-list">${f.controls}</div>
-      <h3>Avertissement</h3><p style="color:var(--mute);font-size:13px">Tout dysfonctionnement annule les parties et les gains. Une connexion internet stable est nécessaire ; en cas de coupure, rechargez le jeu pour terminer une partie en cours. Le taux de retour est une valeur théorique calculée sur un très grand nombre de parties. Tous les résultats sont déterminés par le serveur ; les animations et les valeurs affichées sont illustratives. Spooky Burst™ © ${new Date().getFullYear()} KPOS. Tous droits réservés.</p>`,
-    rulesBuy:(a,b)=>`<h3>Bonus et Super bonus</h3><p>Bonus : ${a} (100 fois ${soc?'le montant':'la mise'}). Super bonus, toutes les cases à x2 : ${b} (300 fois ${soc?'le montant':'la mise'}).</p>`, close:'Fermer'
+      <h3>Avertissement</h3><p style="color:var(--mute);font-size:13px">Tout dysfonctionnement annule les parties et les gains. Une connexion internet stable est nécessaire ; en cas de coupure, rechargez le jeu pour terminer une partie en cours. Le taux de retour est une valeur théorique calculée sur un très grand nombre de parties. L'affichage du jeu ne représente aucun appareil physique et n'est qu'illustratif. Les gains sont réglés selon le montant reçu du serveur de jeu (RGS), et non selon les événements affichés dans le navigateur. Spooky Burst™ © ${new Date().getFullYear()} KPOS. Tous droits réservés.</p>`,
+    rulesBuy:(a,b)=>`<h3>Bonus et Super bonus</h3><p>Bonus : ${a} (100 fois ${soc?'le montant':'la mise'}). Super bonus, ${CFG.MODES.super.startCells} cases au hasard à x${CFG.MODES.super.startValue} : ${b} (300 fois ${soc?'le montant':'la mise'}).</p>`, close:'Fermer'
   };
   return LANG==='fr' ? fr : en;
 }
@@ -325,6 +325,7 @@ async function spin(){
 async function buy(sup){
   if(!ready||busy||inFS||REPLAY||JUR.disabledBuyFeature) return;
   const b=bet(), mode=sup?'super':'bonus', price=b*CFG.MODES[mode].cost;
+  if(balance<price){ showError({code:'ERR_IPB'}); return; }
   const ok=await modal(`<div class="kicker">${sup?T.sup:T.buy}</div><h2>${fmt(price)}</h2><p>${T.confirm(fmt(b),sup)}</p>`, [[T.cancel,false,'ghost'],[T.buyBtn,true]]);
   if(!ok) return;
   if(balance<price){ showError({code:'ERR_IPB'}); return; }
@@ -366,7 +367,8 @@ function paintMute(){ $('muteIcon').innerHTML = muted ? '<path d="M4 9v6h4l5 4V5
 $('muteBtn').onclick=()=>{ muted=!muted; try{ localStorage.setItem('cb-muted',muted?'1':'0'); }catch(e){} paintMute(); A(); SFX.click(); Music.play(); };
 /* [228] barre espace : toujours un spin (hors fenêtres et listes), jamais un clic sur le bouton qui a le focus */
 addEventListener('keydown',e=>{ if(e.code!=='Space' && e.key!==' ') return;
-  if(JUR.disabledSpacebar || REPLAY || document.querySelector('.ov,.bigwin,.boot') || document.activeElement.tagName==='SELECT') return;
+  if(document.querySelector('.ov,.bigwin,.boot')){ e.preventDefault(); e.stopPropagation(); return; }   // jamais de validation d'une fenêtre (achat, autoplay) à la barre espace
+  if(JUR.disabledSpacebar || REPLAY || document.activeElement.tagName==='SELECT') return;
   e.preventDefault(); if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); A(); if(!e.repeat) spin(); }, true);
 addEventListener('pointerup',()=>{ const a=document.activeElement; if(a && a.tagName==='BUTTON') a.blur(); });
 paintMute();
@@ -466,4 +468,19 @@ async function runReplay(){
     sub("    document.body.appendChild(ov); (row.querySelector('.go')||row.firstChild).focus({preventScroll:true});",
         "    document.body.appendChild(ov); (row.querySelector('.go')||row.firstChild).focus({preventScroll:true});\n"
         "    if(REPLAY && buttons.length===1) setTimeout(()=>{ if(ov.isConnected){ ov.remove(); res(buttons[0][1]); } }, 2500);")
+    # ---------------------------------------------------------------- différences avec Sugar Rush : échelle de multiplicateurs, départ du Super bonus
+    sub("const MULT_COLORS = {2:'#3a86ff',4:'#2ecc71',8:'#ffd60a',16:'#ff9f1c',32:'#ff4d4d',64:'#c77dff',128:'#ff5fa2',256:'#22d3ee',512:'#ffffff',1024:'#ffc83d'};",
+        "const MULT_COLORS = {2:'#3a86ff',3:'#2ecc71',5:'#ffd60a',10:'#ff9f1c',25:'#ff4d4d',50:'#c77dff',100:'#ffc83d'};")
+    sub("s.classList.toggle('fire', v>=64 && v<512); s.classList.toggle('inferno', v>=512);", "s.classList.toggle('fire', v>=25 && v<MAX_MULT); s.classList.toggle('inferno', v>=MAX_MULT);")
+    sub("bd.classList.toggle('t1024',v===1024);", "bd.classList.toggle('t1024',v===MAX_MULT);")
+    sub("        spots=zero(e.startMult); renderAllSpots();", "        spots=zero(0); for(const [i,v] of (e.startCells||[])){ const [r,c]=cellRC(i); spots[r][c]=v; } renderAllSpots();")
+    sub("${e.startMult?'<p>'+T.introSup+'</p>':''}", "${(e.startCells||[]).length?'<p>'+T.introSup+'</p>':''}")
+    # ---------------------------------------------------------------- [222] boutons d'achat cliquables même si le solde manque (le clic explique pourquoi)
+    sub("$('buyStd').disabled = busy||inFS||balance<b*BUY_STD||REPLAY; $('buySup').disabled = busy||inFS||balance<b*BUY_SUP||REPLAY;",
+        "$('buyStd').disabled = busy||inFS||REPLAY; $('buySup').disabled = busy||inFS||REPLAY; $('buyStd').classList.toggle('short', balance<b*BUY_STD); $('buySup').classList.toggle('short', balance<b*BUY_SUP);")
+    sub("</style>\n</head>", ".buy.short{filter:saturate(.35) brightness(.8)}\n</style>\n</head>")
+    # ---------------------------------------------------------------- [228] le focus des fenêtres de choix va sur « Annuler »
+    sub("(row.querySelector('.go')||row.firstChild).focus({preventScroll:true});", "(row.querySelector('.ghost')||row.querySelector('.go')||row.firstChild).focus({preventScroll:true});")
+    # ---------------------------------------------------------------- pas de requête favicon.ico (erreur 404 dans la console)
+    sub("<title>Spooky Burst</title>", "<title>Spooky Burst</title>\n<link rel=\"icon\" href=\"data:,\">")
     return s

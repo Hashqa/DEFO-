@@ -127,8 +127,8 @@ const TIERS = [{x:20},{x:50},{x:100},{x:250}].map((t,i)=>({x:t.x,label:T.tiers[i
 ''')
 
 # thème fixe : Halloween uniquement
-sub("    names:['Chaudron','Citrouille','Crâne','Fantôme','Chauve-souris','Potion','Bonbon','Lune de sang'],",
-    "    names: LANG==='fr' ? ['Chaudron','Citrouille','Crâne','Fantôme','Chauve-souris','Potion','Bonbon','Lune de sang'] : ['Cauldron','Pumpkin','Skull','Ghost','Bat','Potion','Candy corn','Blood moon'],")
+sub("    names:['Chaudron','Citrouille','Crâne','Fantôme','Chauve-souris','Potion','Araignée','Lune de sang'],",
+    "    names: LANG==='fr' ? ['Chaudron','Citrouille','Crâne','Fantôme','Chauve-souris','Potion','Araignée','Lune de sang'] : ['Cauldron','Pumpkin','Skull','Ghost','Bat','Potion','Spider','Blood moon'],")
 sub("let themeId = 'classic';\ntry { const t=localStorage.getItem('cb-theme'); if(THEMES[t]) themeId=t; } catch(e){}", "let themeId = 'halloween';")
 sub("  try{ localStorage.setItem('cb-theme',id); }catch(e){}\n", "")
 sub("  document.title = T.logo.map(w=>w[0]+w.slice(1).toLowerCase()).join(' ');\n", "")

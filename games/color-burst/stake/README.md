@@ -35,8 +35,8 @@ Les trois modes passent les contrôles du Math SDK officiel (`utils/rgs_verifica
 
 ## Comment c'est construit
 
-- `engine.js` : le moteur du jeu (grille 7×7, cascades, cases multiplicatrices, free spins, gain minimum de 10× par bonus, plafond à 25 000×). Il produit chaque partie sous forme de liste d'événements. Tous les gains sont en dixièmes de mise, comme l'exige Stake.
-- `math/generate.js` : simule 200 000 parties normales et 20 000 parties par mode bonus, ajoute des parties « gain max », calcule les poids (retour exact de 96,2 % et respect des limites de volatilité), écrit les fichiers et vérifie le format.
+- `engine.js` : le moteur du jeu (grille 7×7, cascades, cases multiplicatrices x2 → x3 → x5 → x10 → x25 → x50 → x100, free spins 8 à 20, Super bonus avec 10 cases au hasard à x5, gain minimum de 10× par bonus, plafond à 25 000×, bonus naturel environ 1 spin sur 135). Il produit chaque partie sous forme de liste d'événements. Tous les gains sont en dixièmes de mise, comme l'exige Stake.
+- `math/generate.js` : simule 150 000 parties normales et 12 000 parties par mode bonus, ajoute des parties « gain max », calcule les poids (retour exact de 96,2 % et respect des limites de volatilité), écrit les fichiers et vérifie le format.
 - `tools/build_frontend.py` : fabrique `frontend/` à partir du jeu (`../index.html`). Le front-end demande chaque partie au serveur Stake (`/wallet/authenticate`, `/wallet/play`, `/wallet/end-round`) et anime les événements reçus. Il gère aussi :
   - la reprise d'une partie interrompue ;
   - le rejeu (`?replay=true`) ;
@@ -51,7 +51,7 @@ Les trois modes passent les contrôles du Math SDK officiel (`utils/rgs_verifica
 ## Refaire les fichiers
 
 ```bash
-node stake/math/generate.js 200000 20000 20000       # fichiers mathématiques (≈ 1 min)
+node stake/math/generate.js 150000 12000 12000       # fichiers mathématiques (≈ 1 min)
 python3 stake/tools/build_frontend.py                # front-end
 node stake/tools/mock-rgs.js 8787                    # test local
 # puis ouvrir http://localhost:8787/index.html?sessionID=test&lang=en&rgs_url=http://localhost:8787

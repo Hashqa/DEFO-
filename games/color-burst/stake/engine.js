@@ -7,7 +7,7 @@
     multUpdate  { cells:[[case, nouvelle valeur]] }
     tumble      { removed:[cases], add:[7 chaînes : nouveaux symboles par colonne, du haut vers le bas] }
     scatters    { count, cells:[cases] }
-    freeSpinTrigger { count, scatters, startMult } · freeSpin { number, left } · freeSpinRetrigger { added, left }
+    freeSpinTrigger { count, scatters, startCells:[[case, valeur]] } · freeSpin { number, left } · freeSpinRetrigger { added, left }
     freeSpinEnd { total, played, topUp, maxed } · winCap { amount } · finalWin { amount }
   Utilisé à la fois par le générateur de fichiers mathématiques (Node) et par le front-end
   (mode démo hors Stake). Tous les gains sont en dixièmes de mise (entiers) : 1 = 0,1 × la mise,
@@ -24,24 +24,25 @@
   // Gains par symbole et taille de groupe (5..14, 15+), en dixièmes de mise.
   // Courbe exponentielle : chaque symbole en plus multiplie le gain par 1,5.
   const SYMBOL_FACTOR = [1, .75, .6, .5, .42, .36, .3];
-  const PAY_SCALE = 0.387;
+  const PAY_SCALE = 0.36;
   const PAYTABLE = SYMBOL_FACTOR.map(f => Array.from({ length: 11 }, (_, i) => Math.max(1, Math.round(Math.pow(1.5, i) * f * PAY_SCALE * 10))));
 
   const CONFIG = {
     COLS, ROWS, SCATTER, PAYTABLE,
     BASE_WEIGHTS: [7, 8, 9, 10, 11, 12, 13],
-    SCATTER_W: 0.6,
+    SCATTER_W: 0.66,
     BOOST_BASE: 10,
-    BOOST_FS: 11, BOOST_FS_HOT: 45, HOT_CHANCE: 0.04,
-    MAX_MULT: 1024,
-    FS_AWARD: { 3: 10, 4: 12, 5: 15, 6: 20, 7: 30 },
+    BOOST_FS: 16, BOOST_FS_HOT: 45, HOT_CHANCE: 0.04,
+    MULT_LADDER: [2, 3, 5, 10, 25, 50, 100],   // valeur d'une case après 1, 2, 3… explosions
+    MAX_MULT: 100,
+    FS_AWARD: { 3: 8, 4: 10, 5: 12, 6: 15, 7: 20 },
     RETRIGGER: 5,
     MIN_BONUS: 100,          // 10 × la mise (en dixièmes)
     MAX_WIN: 250000,         // 25 000 × la mise (en dixièmes)
     MODES: {
       base:  { cost: 1,   label: 'Spin' },
-      bonus: { cost: 100, label: 'Bonus', buy: true, startMult: 0 },
-      super: { cost: 300, label: 'Super bonus', buy: true, startMult: 2 }
+      bonus: { cost: 100, label: 'Bonus', buy: true },
+      super: { cost: 300, label: 'Super bonus', buy: true, startCells: 10, startValue: 5 }   // 10 cases au hasard démarrent à x5
     }
   };
 
@@ -85,6 +86,7 @@
       }
       return out;
     }
+    const nextMult = v => { const L = C.MULT_LADDER, k = L.indexOf(v); return v === 0 ? L[0] : k < 0 || k === L.length - 1 ? v : L[k + 1]; };
     const pay = (s, n) => C.PAYTABLE[s][Math.min(n, 15) - 5];
 
     // Un spin avec cascades. Ajoute les événements, renvoie le gain (dixièmes).
@@ -106,7 +108,7 @@
         ev.push({ type: 'winInfo', wins, stepWin: step, spinWin: win });
         if (maxed) { ev.push({ type: 'winCap', amount: win }); break; }
         const ups = [];
-        for (const k of cl) for (const [r, c] of k.cells) { const v = spots[r][c], nv = v === 0 ? 2 : Math.min(v * 2, C.MAX_MULT); if (nv !== v) { spots[r][c] = nv; ups.push([r * COLS + c, nv]); } }
+        for (const k of cl) for (const [r, c] of k.cells) { const v = spots[r][c], nv = nextMult(v); if (nv !== v) { spots[r][c] = nv; ups.push([r * COLS + c, nv]); } }
         // gravité : les symboles restants tombent, de nouveaux arrivent par le haut
         const removed = new Set(); for (const k of cl) for (const [r, c] of k.cells) removed.add(r * COLS + c);
         const add = [];
@@ -124,11 +126,16 @@
       if (!maxed && sc >= 3) ev.push({ type: 'scatters', count: sc, cells: scCells });
       return { win, maxed, sc };
     }
-    const fsFor = n => n >= 7 ? 30 : (C.FS_AWARD[n] || 0);
+    const fsFor = n => C.FS_AWARD[Math.min(n, 7)] || 0;
 
-    function freeSpins(ev, count, startMult, capLeft, scCount, forceHot) {
-      const spots = zero(startMult);
-      ev.push({ type: 'freeSpinTrigger', count, scatters: scCount, startMult });
+    function freeSpins(ev, count, M, capLeft, scCount, forceHot) {
+      const spots = zero(0), startCells = [];
+      if (M.startCells) {
+        const all = [...Array(ROWS * COLS).keys()];
+        for (let k = 0; k < M.startCells; k++) { const i = all.splice((rnd() * all.length) | 0, 1)[0]; spots[(i / COLS) | 0][i % COLS] = M.startValue; startCells.push([i, M.startValue]); }
+        startCells.sort((a, b) => a[0] - b[0]);
+      }
+      ev.push({ type: 'freeSpinTrigger', count, scatters: scCount, startCells });
       let left = count, total = 0, played = 0, maxed = false;
       while (left > 0) {
         left--; played++;
@@ -153,7 +160,7 @@
       total += first.win; base += first.win;
       if (!first.maxed && (M.buy || first.sc >= 3)) {
         const sc = Math.max(3, first.sc);
-        const fs = freeSpins(ev, fsFor(sc), M.startMult || 0, cap - total, sc, o.forceHot);
+        const fs = freeSpins(ev, fsFor(sc), M, cap - total, sc, o.forceHot);
         total += fs.total; free += fs.total;
       }
       if (total > cap) total = cap;
