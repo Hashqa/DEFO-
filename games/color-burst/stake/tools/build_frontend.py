@@ -478,6 +478,9 @@ import importlib.util
 _spec = importlib.util.spec_from_file_location('stake_fixes', os.path.join(HERE, 'stake_fixes.py'))
 _fx = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_fx)
 s = _fx.apply(s)
+_spec2 = importlib.util.spec_from_file_location('stake_polish', os.path.join(HERE, 'stake_polish.py'))
+_po = importlib.util.module_from_spec(_spec2); _spec2.loader.exec_module(_po)
+s = _po.apply(s)
 
 # ------------------------------------------------------------------ écriture
 os.makedirs(OUT, exist_ok=True)
@@ -485,7 +488,7 @@ open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(s)
 shutil.copy(os.path.join(GAME, 'stake', 'engine.js'), os.path.join(OUT, 'engine.js'))
 dst = os.path.join(OUT, 'theme', 'halloween')
 if os.path.exists(dst): shutil.rmtree(dst)
-shutil.copytree(os.path.join(GAME, 'theme', 'halloween'), dst)
+shutil.copytree(os.path.join(GAME, 'theme', 'halloween'), dst, ignore=shutil.ignore_patterns('hires'))
 fdst = os.path.join(OUT, 'theme', 'fonts')
 if os.path.exists(fdst): shutil.rmtree(fdst)
 shutil.copytree(os.path.join(GAME, 'stake', 'fonts'), fdst)
