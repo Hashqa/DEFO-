@@ -1,0 +1,45 @@
+<!doctype html><meta charset="utf-8"><title>sfx</title>
+<script>
+/* Effets sonores de Spooky Burst, synthétisés hors ligne (OfflineAudioContext) puis exportés en WAV.
+   Rendu : node tools/render-sfx.js  →  theme/halloween/sfx/<nom>.mp3 */
+const SR = 44100;
+function ctx(dur){ return new OfflineAudioContext(2, Math.ceil(SR*dur), SR); }
+function noiseBuf(c, dur){ const b=c.createBuffer(1, Math.ceil(SR*dur), SR), d=b.getChannelData(0); let s=7; for(let i=0;i<d.length;i++){ s=(s*16807)%2147483647; d[i]=(s/1073741823.5)-1; } return b; }
+function reverb(c, secs=2, decay=3){ const len=Math.ceil(SR*secs), b=c.createBuffer(2,len,SR); for(let ch=0;ch<2;ch++){ const d=b.getChannelData(ch); let s=11+ch; for(let i=0;i<len;i++){ s=(s*16807)%2147483647; d[i]=((s/1073741823.5)-1)*Math.pow(1-i/len,decay); } } const v=c.createConvolver(); v.buffer=b; return v; }
+function bus(c, wet=.3, secs=2){ const out=c.createGain(), dry=c.createGain(), w=c.createGain(), v=reverb(c,secs); out.connect(dry).connect(c.destination); out.connect(v).connect(w).connect(c.destination); w.gain.value=wet; dry.gain.value=1; return out; }
+function env(g, t, a, peak, d, end=.0001){ g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(peak,t+a); g.gain.exponentialRampToValueAtTime(end,t+a+d); }
+function osc(c, type, f, t, dur, peak, out, opts={}){ const o=c.createOscillator(), g=c.createGain(); o.type=type; o.frequency.setValueAtTime(f,t); if(opts.to) o.frequency.exponentialRampToValueAtTime(opts.to,t+(opts.toT||dur)); if(opts.detune) o.detune.value=opts.detune;
+  let n=o; if(opts.lp){ const fl=c.createBiquadFilter(); fl.type='lowpass'; fl.frequency.setValueAtTime(opts.lp,t); if(opts.lpTo) fl.frequency.exponentialRampToValueAtTime(opts.lpTo,t+dur); fl.Q.value=opts.q||1; o.connect(fl); n=fl; }
+  env(g,t,opts.a||.005,peak,dur); n.connect(g).connect(out); o.start(t); o.stop(t+dur+.05); return o; }
+function noise(c, t, dur, peak, out, type='bandpass', f=1000, opts={}){ const s=c.createBufferSource(); s.buffer=noiseBuf(c,dur+.1); const fl=c.createBiquadFilter(); fl.type=type; fl.frequency.setValueAtTime(f,t); if(opts.to) fl.frequency.exponentialRampToValueAtTime(opts.to,t+dur); fl.Q.value=opts.q||1; const g=c.createGain(); env(g,t,opts.a||.003,peak,dur); s.connect(fl).connect(g).connect(out); s.start(t); s.stop(t+dur+.1); }
+// cloche : partiels inharmoniques à décroissance exponentielle
+function bell(c, f, t, dur, peak, out, ratios=[1,2.76,5.4,8.93], amps=[1,.5,.28,.14]){ ratios.forEach((r,i)=>osc(c,'sine',f*r,t,dur/(1+i*.6),peak*amps[i],out,{a:.002})); }
+
+const SOUNDS = {
+  click(){ const c=ctx(.12), o=bus(c,.08,.4); osc(c,'sine',1900,0,.05,.35,o,{to:1200}); noise(c,0,.02,.25,o,'highpass',4000); return c; },
+  spin(){ const c=ctx(.6), o=bus(c,.2,1); noise(c,0,.45,.5,o,'bandpass',350,{to:2600,q:1.4,a:.08}); osc(c,'sine',140,0,.18,.6,o,{to:50}); return c; },
+  land(){ const c=ctx(.25), o=bus(c,.12,.6); osc(c,'sine',120,0,.14,.8,o,{to:52}); osc(c,'triangle',240,0,.05,.18,o,{to:120}); noise(c,0,.03,.3,o,'lowpass',900); return c; },
+  win(){ const c=ctx(1.6), o=bus(c,.35,2.2); [1046.5,1318.5,1568,2093].forEach((f,i)=>bell(c,f,i*.055,1.1,.22,o)); noise(c,0,.5,.06,o,'highpass',7000,{a:.02}); return c; },
+  pop(){ const c=ctx(.45), o=bus(c,.18,.8); noise(c,0,.09,.7,o,'bandpass',1400,{q:.8}); osc(c,'sine',320,0,.16,.7,o,{to:70}); osc(c,'sine',2400,.01,.08,.12,o,{to:4200}); return c; },
+  mult(){ const c=ctx(1.0), o=bus(c,.35,1.6); osc(c,'sine',700,0,.22,.35,o,{to:1500,a:.01}); osc(c,'triangle',1400,0,.2,.12,o,{to:3000}); bell(c,1760,.18,.7,.22,o); return c; },
+  scatter(){ const c=ctx(2.6), o=bus(c,.45,3); bell(c,220,0,2.2,.5,o,[1,2.0,3.01,4.2,5.4],[1,.6,.4,.22,.12]); osc(c,'sine',110,0,1.6,.35,o,{a:.05}); noise(c,0,1.2,.05,o,'bandpass',3000,{q:4,a:.2}); return c; },
+  tension(){ const c=ctx(.9), o=bus(c,.25,1.2); osc(c,'sawtooth',110,0,.75,.18,o,{to:440,lp:600,lpTo:3500,a:.15,q:4}); noise(c,0,.75,.18,o,'bandpass',500,{to:5000,q:2,a:.3}); osc(c,'sine',55,0,.3,.6,o,{to:40}); return c; },
+  trigger(){ const c=ctx(2.8), o=bus(c,.35,2.6);
+    const ch=[[261.6,329.6,392],[293.7,370,440],[329.6,415.3,493.9],[392,493.9,587.3,784]];
+    ch.forEach((cd,i)=>{ const t=i*.16, d=i===3?1.6:.22; cd.forEach(f=>{ osc(c,'sawtooth',f,t,d,.09,o,{lp:900,lpTo:3500,a:.02,q:2}); osc(c,'sawtooth',f,t,d,.06,o,{lp:900,lpTo:3500,a:.02,detune:12}); }); });
+    noise(c,.48,1.8,.22,o,'highpass',5000,{a:.01}); osc(c,'sine',65,.48,1,.7,o,{to:45}); [1568,2093,2637].forEach((f,i)=>bell(c,f,.5+i*.08,1.4,.12,o)); return c; },
+  big(){ const c=ctx(3.0), o=bus(c,.4,3); osc(c,'sine',58,0,1.8,.9,o,{to:38}); noise(c,0,2.2,.3,o,'highpass',4500,{a:.005}); noise(c,0,.25,.5,o,'lowpass',400);
+    [196,246.9,293.7,392].forEach(f=>{ osc(c,'sawtooth',f,.02,1.6,.08,o,{lp:1200,lpTo:4000,a:.04,q:2}); osc(c,'sawtooth',f*1.005,.02,1.6,.06,o,{lp:1200,lpTo:4000,a:.04}); }); return c; },
+  coin(){ const c=ctx(.6), o=bus(c,.2,.8); bell(c,2350,0,.45,.3,o,[1,1.5,2.9,4.1],[1,.6,.35,.2]); bell(c,3120,.04,.35,.15,o,[1,2.2],[1,.4]); return c; },
+  fsEnd(){ const c=ctx(2.4), o=bus(c,.4,2.6); [523.3,659.3,784,1046.5,1318.5].forEach((f,i)=>bell(c,f,i*.09,1.5,.18,o)); osc(c,'sine',130.8,0,1.6,.3,o,{a:.05}); return c; }
+};
+
+function wav(buf){ const ch=buf.numberOfChannels, len=buf.length, data=new DataView(new ArrayBuffer(44+len*ch*2)); const w=(o,s)=>{ for(let i=0;i<s.length;i++) data.setUint8(o+i,s.charCodeAt(i)); };
+  w(0,'RIFF'); data.setUint32(4,36+len*ch*2,true); w(8,'WAVE'); w(12,'fmt '); data.setUint32(16,16,true); data.setUint16(20,1,true); data.setUint16(22,ch,true); data.setUint32(24,SR,true); data.setUint32(28,SR*ch*2,true); data.setUint16(32,ch*2,true); data.setUint16(34,16,true); w(36,'data'); data.setUint32(40,len*ch*2,true);
+  let peak=0; for(let c=0;c<ch;c++){ const d=buf.getChannelData(c); for(let i=0;i<len;i++) peak=Math.max(peak,Math.abs(d[i])); } const k=peak>0.9?0.9/peak:1;
+  let o=44; for(let i=0;i<len;i++) for(let c=0;c<ch;c++){ const v=Math.max(-1,Math.min(1,buf.getChannelData(c)[i]*k)); data.setInt16(o,v*32767,true); o+=2; }
+  let s=''; const u=new Uint8Array(data.buffer); for(let i=0;i<u.length;i+=32768) s+=String.fromCharCode.apply(null,u.subarray(i,i+32768)); return btoa(s); }
+async function render(name){ const c=SOUNDS[name](); const b=await c.startRendering(); return wav(b); }
+window.sfx={names:Object.keys(SOUNDS),render};
+document.title='ready';
+</script>

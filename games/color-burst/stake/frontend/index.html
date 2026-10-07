@@ -464,11 +464,11 @@ body.replay .board-wrap{width:min(calc(100vh - var(--topH) - var(--wbH) - var(--
 
 /* ---- logo ---- */
 .sb-logo{flex:0 0 auto;display:flex;justify-content:center}
-.sb .logo{margin:0;font-family:var(--display);font-weight:400;font-size:min(calc(var(--sideW)*.2), 7vh)!important;line-height:.86;text-align:center;letter-spacing:.01em;white-space:nowrap;
+.sb .logo,.sb-splash .logo{margin:0;font-family:var(--display);font-weight:400;font-size:min(calc(var(--sideW)*.2), 7vh)!important;line-height:.86;text-align:center;letter-spacing:.01em;white-space:nowrap;
   filter:drop-shadow(0 .06em 0 #22062e) drop-shadow(.035em 0 0 #22062e) drop-shadow(-.035em 0 0 #22062e) drop-shadow(0 -.035em 0 #22062e) drop-shadow(0 0 .25em rgba(255,110,20,.55))}
-.sb .logo span{display:inline-block;color:transparent!important;background:linear-gradient(180deg,#fff2b8 0%,#ffbe2e 42%,#f05a0a 100%);-webkit-background-clip:text;background-clip:text;transform:rotate(-5deg) translateY(.03em)}
-.sb .logo span:nth-child(even){transform:rotate(4deg) translateY(-.02em)}
-.sb .logo b{display:block;margin:.02em 0 0!important;font-weight:400;font-size:1.06em;letter-spacing:.06em;color:transparent!important;background:linear-gradient(180deg,#f2ffc8 0%,#7dff6a 45%,#0f9a35 100%);-webkit-background-clip:text;background-clip:text}
+.sb .logo span,.sb-splash .logo span{display:inline-block;color:transparent!important;background:linear-gradient(180deg,#fff2b8 0%,#ffbe2e 42%,#f05a0a 100%);-webkit-background-clip:text;background-clip:text;transform:rotate(-5deg) translateY(.03em)}
+.sb .logo span:nth-child(even),.sb-splash .logo span:nth-child(even){transform:rotate(4deg) translateY(-.02em)}
+.sb .logo b,.sb-splash .logo b{display:block;margin:.02em 0 0!important;font-weight:400;font-size:1.06em;letter-spacing:.06em;color:transparent!important;background:linear-gradient(180deg,#f2ffc8 0%,#7dff6a 45%,#0f9a35 100%);-webkit-background-clip:text;background-clip:text}
 
 /* ---- cartes d'achat ---- */
 .sb-buys{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:calc(var(--pad)*1.4)}
@@ -682,7 +682,80 @@ body.replay .sb{grid-template-rows:minmax(0,1fr) 0;--board:min(calc(100vh - var(
   .sb-right .sb-icon{width:calc(var(--barH)*.36);height:calc(var(--barH)*.36)}
   body.replay .sb{grid-template-rows:var(--topH) minmax(0,1fr) 0 0;--board:min(calc(100vw - var(--pad)*3), calc(100vh - var(--topH) - var(--msgH) - var(--pad)*6 - 26px))}
 }
-@media (prefers-reduced-motion: reduce){ .sb *{animation:none!important} }
+
+/* ---- panneau des mises ---- */
+.sb-cell.bet{cursor:pointer;border-radius:10px;padding:2px 6px;margin:-2px -6px;transition:background .15s}
+.sb-cell.bet:hover{background:rgba(255,255,255,.07)}
+.sb-cell.bet .caret{font-style:normal;color:var(--gold);font-size:1.1em}
+.sb-betpanel .chips{grid-template-columns:repeat(4,1fr);max-height:min(52vh,320px);overflow:auto}
+.sb-betpanel button.cur{background:linear-gradient(180deg,#ffe486,#f09a1a);color:#2a1400}
+.sb-betpanel{min-width:min(300px,calc(100vw - 16px))}
+.sb-betpanel button{font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+
+/* ---- décor animé ---- */
+.sb-amb{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.sb-amb .fog{position:absolute;left:-30%;width:160%;height:45%;bottom:-8%;opacity:.55;filter:blur(18px);
+  background:radial-gradient(ellipse 22% 45% at 15% 60%,rgba(190,170,255,.32),transparent 70%),radial-gradient(ellipse 25% 40% at 45% 70%,rgba(160,140,230,.28),transparent 70%),radial-gradient(ellipse 22% 45% at 78% 60%,rgba(190,170,255,.3),transparent 70%);
+  animation:sbFog 38s ease-in-out infinite alternate}
+.sb-amb .fog.f2{bottom:-14%;opacity:.4;animation-duration:52s;animation-direction:alternate-reverse}
+@keyframes sbFog{to{transform:translateX(18%)}}
+body.fs .sb-amb .fog{background:radial-gradient(ellipse 22% 45% at 15% 60%,rgba(255,140,80,.3),transparent 70%),radial-gradient(ellipse 25% 40% at 45% 70%,rgba(255,90,60,.25),transparent 70%),radial-gradient(ellipse 22% 45% at 78% 60%,rgba(255,140,80,.28),transparent 70%)}
+.sb-amb .bat{position:absolute;width:var(--s);height:calc(var(--s)*.5);top:var(--y);left:-8%;opacity:.85;animation:sbBat var(--d) linear infinite;animation-delay:var(--w)}
+.sb-amb .bat svg{width:100%;height:100%;fill:#12061c;animation:sbFlap .22s ease-in-out infinite alternate}
+@keyframes sbBat{0%{transform:translate(0,0)}25%{transform:translate(30vw,-4vh)}50%{transform:translate(60vw,2vh)}75%{transform:translate(90vw,-3vh)}100%{transform:translate(118vw,1vh)}}
+@keyframes sbFlap{to{transform:scaleY(.45)}}
+.sb-amb .mote{position:absolute;bottom:-4%;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#fff6d0,rgba(255,200,90,.6) 40%,transparent 70%);opacity:0;animation:sbMote var(--d) linear infinite;animation-delay:var(--w)}
+body.fs .sb-amb .mote{background:radial-gradient(circle,#fff0c0,rgba(255,110,40,.8) 40%,transparent 70%)}
+@keyframes sbMote{0%{transform:translate(0,0);opacity:0}10%{opacity:.9}100%{transform:translate(var(--dx),-105vh);opacity:0}}
+
+/* ---- animation de gain propre à chaque symbole ---- */
+.sb .sym.win .symimg{filter:drop-shadow(0 0 calc(var(--board)*.018) var(--wc,#fff)) drop-shadow(0 0 calc(var(--board)*.006) #fff) brightness(1.12)}
+.sb .sym.s0{--wc:#39ff6a}.sb .sym.s1{--wc:#ff9a1a}.sb .sym.s2{--wc:#ff3b3b}.sb .sym.s3{--wc:#e6deff}.sb .sym.s4{--wc:#b07cff}.sb .sym.s5{--wc:#ff5fb8}.sb .sym.s6{--wc:#ffd23f}.sb .sym.s7{--wc:#ff2a2a}
+body .sb .sym.s0.win .in{animation:wCauldron .5s ease-in-out infinite}
+@keyframes wCauldron{0%,100%{transform:rotate(0) scale(1.08)}25%{transform:rotate(-6deg) scale(1.14,1.02)}50%{transform:rotate(0) scale(1.02,1.16) translateY(-4%)}75%{transform:rotate(6deg) scale(1.14,1.02)}}
+body .sb .sym.s1.win .in{animation:wPumpkin .42s ease-in-out infinite alternate}
+@keyframes wPumpkin{from{transform:scale(1.04);filter:brightness(1)}to{transform:scale(1.18) rotate(-3deg);filter:brightness(1.45)}}
+body .sb .sym.s2.win .in{animation:wSkull .36s ease-in-out infinite}
+@keyframes wSkull{0%,100%{transform:rotate(0) scale(1.08)}30%{transform:rotate(-10deg) scale(1.14) translateY(-3%)}60%{transform:rotate(9deg) scale(1.12)}}
+body .sb .sym.s3.win .in{animation:wGhost .7s ease-in-out infinite alternate}
+@keyframes wGhost{from{transform:translateY(4%) rotate(-5deg) scale(1.06);opacity:1}to{transform:translateY(-12%) rotate(6deg) scale(1.16);opacity:.85}}
+body .sb .sym.s4.win .in{animation:wBat .16s ease-in-out infinite alternate}
+@keyframes wBat{from{transform:scale(1.22,.86) translateY(2%)}to{transform:scale(.92,1.12) translateY(-8%)}}
+body .sb .sym.s5.win .in{animation:wPotion .5s ease-in-out infinite}
+@keyframes wPotion{0%,100%{transform:rotate(0) scale(1.08)}25%{transform:rotate(-12deg) scale(1.14)}75%{transform:rotate(12deg) scale(1.14)}}
+body .sb .sym.s6.win .in{animation:wSpider .55s cubic-bezier(.4,1.6,.6,1) infinite alternate}
+@keyframes wSpider{from{transform:translateY(-12%) scale(1.04)}to{transform:translateY(6%) scale(1.14,1.06)}}
+.sb .sym.win .in::after{content:"";position:absolute;inset:10%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--wc) 55%,transparent),transparent 70%);z-index:-1;animation:wAura .5s ease-in-out infinite alternate}
+.sb .sym .in{position:relative;isolation:isolate}
+@keyframes wAura{from{transform:scale(.8);opacity:.6}to{transform:scale(1.25);opacity:1}}
+
+/* ---- multiplicateurs qui volent vers le gain ---- */
+.sb .flychip{position:absolute;transform:translate(-50%,-50%);z-index:5;font-family:var(--display);font-size:calc(var(--board)*.032);padding:.05em .45em;border-radius:999px;color:#1a0a24;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--t) 45%,#fff),var(--t) 60%);box-shadow:0 0 calc(var(--board)*.02) var(--t),0 2px 0 rgba(0,0,0,.4);pointer-events:none;white-space:nowrap}
+
+/* ---- écran d'accueil ---- */
+.sb-splash{position:fixed;inset:0;z-index:85;display:grid;place-items:center;padding:16px;overflow:hidden;cursor:pointer;
+  background:radial-gradient(ellipse at 50% 40%,rgba(70,30,120,.75),rgba(8,3,16,.94) 70%);animation:fadeIn .4s}
+.sb-splash::before{content:"";position:absolute;left:50%;top:42%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;pointer-events:none;
+  background:repeating-conic-gradient(from 0deg,rgba(255,170,60,.1) 0deg 7deg,transparent 7deg 16deg);animation:sbRays 30s linear infinite;-webkit-mask:radial-gradient(circle,#000 8%,transparent 55%);mask:radial-gradient(circle,#000 8%,transparent 55%)}
+.sb-splash.out{animation:sbSplashOut .45s ease-in forwards}
+@keyframes sbSplashOut{to{opacity:0;transform:scale(1.06)}}
+.sb-splash .in{position:relative;display:flex;flex-direction:column;align-items:center;gap:min(2.6vh,22px);text-align:center;max-width:860px}
+.sb-splash .logo{font-size:min(11vh,12vw)!important;animation:sbLogoIn .9s cubic-bezier(.3,1.5,.5,1)}
+@keyframes sbLogoIn{from{transform:scale(.4) translateY(-20%);opacity:0}}
+.sb-splash .demo{display:flex;gap:min(1.4vh,12px);justify-content:center}
+.sb-splash .cell{position:relative;width:min(11vh,15vw);height:min(11vh,15vw);border-radius:22%;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));box-shadow:inset 0 0 0 2px rgba(255,255,255,.12);display:grid;place-items:center}
+.sb-splash .cell img{width:84%;height:84%;object-fit:contain;animation:sbIdle 3s ease-in-out infinite}
+.sb-splash .cell b{position:absolute;right:-8%;bottom:-8%;font-family:var(--display);font-weight:400;font-size:min(3.2vh,4.4vw);padding:.04em .45em;border-radius:999px;color:#1a0a24;background:linear-gradient(180deg,color-mix(in srgb,var(--t) 45%,#fff),var(--t) 60%);box-shadow:0 0 14px var(--t),0 2px 0 rgba(0,0,0,.4);transition:background .2s}
+.sb-splash .cell.lit{box-shadow:inset 0 0 0 3px var(--t),0 0 24px var(--t)}
+.sb-splash .cell.lit b{animation:sbBadge .5s cubic-bezier(.3,1.8,.5,1)}
+.sb-splash .tag{font-family:var(--display);font-size:min(4.4vh,6vw);line-height:1.1;background:linear-gradient(180deg,#fff6c8,#ffc23d 55%,#ff7a00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #3a0c00)}
+.sb-splash .feats{display:flex;gap:min(2vw,18px);flex-wrap:wrap;justify-content:center}
+.sb-splash .feats span{font-size:min(2.2vh,3.4vw);font-weight:700;color:#e8defe;background:rgba(20,10,40,.75);border:1px solid rgba(170,130,255,.4);border-radius:999px;padding:.4em 1em}
+.sb-splash .go{font-family:var(--display);font-size:min(4.6vh,6.4vw);border:3px solid #ffdc8a;border-radius:999px;padding:.3em 1.6em;color:#3a1200;cursor:pointer;
+  background:radial-gradient(circle at 40% 25%,#fff0b0,#ffa22a 45%,#e05a00);box-shadow:0 6px 0 #5a1a00,0 0 30px rgba(255,140,30,.6);animation:sbIdlePulse 2s ease-in-out infinite}
+@media (max-height:300px){ .sb-splash .feats{display:none} .sb-splash .in{gap:6px} }
+@media (prefers-reduced-motion: reduce){ .sb *,.sb-amb *,.sb-splash *{animation:none!important} }
 </style>
 </head>
 <body>
@@ -953,6 +1026,7 @@ body.replay .sb{grid-template-rows:minmax(0,1fr) 0;--board:min(calc(100vh - var(
 </div>
 
 
+<div class="sb-amb" aria-hidden="true"><div class="fog f1"></div><div class="fog f2"></div><div class="bats"></div><div class="motes"></div></div>
 <div class="sb" id="app">
   <div class="sb-col l">
     <div class="sb-logo"><h1 class="logo" aria-label="Spooky Burst"><span>S</span><span>P</span><span>O</span><span>O</span><span>K</span><span>Y</span><b>BURST</b></h1></div>
@@ -1006,12 +1080,13 @@ body.replay .sb{grid-template-rows:minmax(0,1fr) 0;--board:min(calc(100vh - var(
       <button class="sb-round" id="betUp" aria-label="Increase"><svg viewBox="0 0 24 24"><path d="M6 12h12M12 6v12"/></svg></button>
     </div>
     <div class="sb-right">
-      <div class="sb-cell bet"><small id="tBet">Bet</small><output id="bet"></output></div>
+      <div class="sb-cell bet" id="betCell" role="button" tabindex="0" aria-haspopup="dialog"><small><span id="tBet">Bet</span> <i class="caret">▾</i></small><output id="bet"></output></div>
       <div class="grp sb-opt"><button class="sb-icon" id="autoBtn" aria-label="Autoplay" title="Autoplay" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.66-5.66L20 8.5"/><path d="M20 3.5v5h-5"/><path d="M20 12a8 8 0 0 1-13.66 5.66L4 15.5"/><path d="M4 20.5v-5h5"/></svg></button><select id="autoSel" aria-label="Autoplay" tabindex="-1"><option value="0">Auto off</option><option value="10">Auto 10</option><option value="25">Auto 25</option><option value="50">Auto 50</option><option value="100">Auto 100</option></select></div>
       <div class="grp sb-opt"><button class="sb-icon" id="turboBtn" aria-pressed="false" aria-label="Turbo" title="Turbo"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></button></div>
     </div>
   </footer>
 
+  <div class="sb-autopanel sb-betpanel" id="betPanel" role="dialog" hidden><div class="lab" id="tBetLbl">Bet</div><div class="chips"></div></div>
   <div class="sb-autopanel" id="autoPanel" role="dialog" hidden><div class="lab" id="tAutoLbl">Autoplay</div><div class="chips"><button type="button" data-n="10">10</button><button type="button" data-n="25">25</button><button type="button" data-n="50">50</button><button type="button" data-n="100">100</button></div></div>
 
   <section class="values" aria-hidden="true" hidden>
@@ -1057,7 +1132,7 @@ function makeT(soc){
     music:'Music', musicOn:'Turn music on', musicOff:'Turn music off', soundOn:'Turn sound on', soundOff:'Turn sound off', rulesTip:'Game rules', spinAria:'Spin', stopAuto:n=>'Stop autoplay ('+n+')',
     autoAsk:n=>'Start autoplay for '+n+' spins?', autoStart:'Start autoplay', dec:'Decrease', inc:'Increase',
     err:{ ERR_IPB:'Insufficient balance.', ERR_IS:'Your session has expired. Please reload the game.', ERR_ATE:'Authentication failed. Please reload the game.', ERR_GLE: soc?'Play limit reached.':'Limit reached.', ERR_LOC:'This game is not available in your location.', ERR_MAINTENANCE:'The game is under maintenance. Please try again later.', def:'Connection problem. Please try again.' },
-    controls:[['Spin button','Starts a spin. During autoplay it shows the spins left; tap it to stop.'],['− / +',(soc?'Lowers or raises the play amount.':'Lowers or raises the bet.')],['Auto','The circular-arrows button opens the autoplay panel: choose 10, 25, 50 or 100 spins, then confirm. Press it again to stop.'],['Turbo','The lightning button speeds up the animations.'],['Bonus',(soc?'Starts the bonus':'Buys the bonus')+' for 100× the '+(soc?'play amount':'bet')+'.'],['Super bonus',(soc?'Starts the super bonus':'Buys the super bonus')+' for 300× the '+(soc?'play amount':'bet')+`; ${CFG.MODES.super.startCells} random cells start at x${CFG.MODES.super.startValue}.`],['♪ (note)','Turns the music on or off.'],['Speaker','Turns all sound on or off.'],['i','Opens these rules.'],['Space','Starts a spin (when allowed).']],
+    controls:[['Spin button','Starts a spin. During autoplay it shows the spins left; tap it to stop.'],['− / +',(soc?'Lowers or raises the play amount. Tap the play amount to pick it from the list.':'Lowers or raises the bet. Tap the bet amount to pick it from the list.')],['Auto','The circular-arrows button opens the autoplay panel: choose 10, 25, 50 or 100 spins, then confirm. Press it again to stop.'],['Turbo','The lightning button speeds up the animations.'],['Bonus',(soc?'Starts the bonus':'Buys the bonus')+' for 100× the '+(soc?'play amount':'bet')+'.'],['Super bonus',(soc?'Starts the super bonus':'Buys the super bonus')+' for 300× the '+(soc?'play amount':'bet')+`; ${CFG.MODES.super.startCells} random cells start at x${CFG.MODES.super.startValue}.`],['♪ (note)','Turns the music on or off.'],['Speaker','Turns all sound on or off.'],['i','Opens these rules.'],['Space','Starts a spin (when allowed).']],
     rules:(f)=>`<h2>Rules</h2>
       <p>7 × 7 grid. A cluster of <b>5 or more matching symbols</b>, connected horizontally or vertically, awards a win according to its size. Values below are for your current ${soc?'play amount':'bet'} of <b>${f.bet}</b>; each extra symbol in a cluster wins more, up to 15+.</p>
       ${f.table}
@@ -1086,7 +1161,7 @@ function makeT(soc){
     music:'Musique', musicOn:'Activer la musique', musicOff:'Couper la musique', soundOn:'Activer le son', soundOff:'Couper le son', rulesTip:'Règles du jeu', spinAria:'Lancer', stopAuto:n=>'Arrêter l’auto ('+n+')',
     autoAsk:n=>'Lancer '+n+' spins automatiques ?', autoStart:'Lancer l’auto', dec:'Diminuer', inc:'Augmenter',
     err:{ ERR_IPB:'Solde insuffisant.', ERR_IS:'Votre session a expiré. Rechargez le jeu.', ERR_ATE:'Échec de l’authentification. Rechargez le jeu.', ERR_GLE:'Limite atteinte.', ERR_LOC:'Ce jeu n’est pas disponible dans votre pays.', ERR_MAINTENANCE:'Le jeu est en maintenance. Réessayez plus tard.', def:'Problème de connexion. Réessayez.' },
-    controls:[['Bouton de lancement','Lance un spin. En automatique, il affiche les spins restants ; touchez-le pour arrêter.'],['− / +',(soc?'Diminue ou augmente le montant.':'Diminue ou augmente la mise.')],['Auto','Le bouton aux flèches circulaires ouvre le panneau des spins automatiques : choisissez 10, 25, 50 ou 100 spins, puis confirmez. Appuyez à nouveau pour arrêter.'],['Turbo','Le bouton éclair accélère les animations.'],['Bonus',(soc?'Lance le bonus':'Achète le bonus')+' pour 100 fois '+(soc?'le montant':'la mise')+'.'],['Super bonus',(soc?'Lance le super bonus':'Achète le super bonus')+' pour 300 fois '+(soc?'le montant':'la mise')+` ; ${CFG.MODES.super.startCells} cases au hasard démarrent à x${CFG.MODES.super.startValue}.`],['♪ (note)','Active ou coupe la musique.'],['Haut-parleur','Active ou coupe tous les sons.'],['i','Ouvre ces règles.'],['Espace','Lance un spin (si autorisé).']],
+    controls:[['Bouton de lancement','Lance un spin. En automatique, il affiche les spins restants ; touchez-le pour arrêter.'],['− / +',(soc?'Diminue ou augmente le montant. Touchez le montant pour le choisir dans la liste.':'Diminue ou augmente la mise. Touchez la mise pour la choisir dans la liste.')],['Auto','Le bouton aux flèches circulaires ouvre le panneau des spins automatiques : choisissez 10, 25, 50 ou 100 spins, puis confirmez. Appuyez à nouveau pour arrêter.'],['Turbo','Le bouton éclair accélère les animations.'],['Bonus',(soc?'Lance le bonus':'Achète le bonus')+' pour 100 fois '+(soc?'le montant':'la mise')+'.'],['Super bonus',(soc?'Lance le super bonus':'Achète le super bonus')+' pour 300 fois '+(soc?'le montant':'la mise')+` ; ${CFG.MODES.super.startCells} cases au hasard démarrent à x${CFG.MODES.super.startValue}.`],['♪ (note)','Active ou coupe la musique.'],['Haut-parleur','Active ou coupe tous les sons.'],['i','Ouvre ces règles.'],['Espace','Lance un spin (si autorisé).']],
     rules:(f)=>`<h2>Règles</h2>
       <p>Grille de 7 × 7. Un groupe de <b>5 symboles identiques ou plus</b>, reliés horizontalement ou verticalement, rapporte un gain selon sa taille. Le tableau donne les valeurs pour ${soc?'votre montant actuel':'votre mise actuelle'} de <b>${f.bet}</b> : chaque symbole en plus rapporte davantage, jusqu'à 15 et plus.</p>
       ${f.table}
@@ -1140,7 +1215,7 @@ function symSVG(s){
   if(assetOK[img]) return `<img class="symimg" src="${img}" alt="" draggable="false">`;
   return `<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${THEMES[themeId].prefix}${s}"/></svg>`;
 }
-function setWinLook(el,s,on){
+function setWinLook(el,s,on){ if(themeId==='halloween') return;
   const w=themeAsset('win',s); if(!assetOK[w]) return;
   const box=el.querySelector('.in'); if(!box) return;
   box.innerHTML = on ? `<img class="symimg winimg${THEMES[themeId].winBlend==='screen'?' screen':''}" src="${w}" alt="" draggable="false">` : symSVG(s);
@@ -1444,7 +1519,7 @@ let lastWins = [];
 
 async function showWinStep(e, b, step){
   symsEl.classList.add('dimming');
-  lastWins = e.wins; drawOutlines(e.wins);
+  lastWins = e.wins; drawOutlines(e.wins); flyMults(e.wins);
   for(const w of e.wins){
     const cells = w.c.map(cellRC);
     for(const [r,c] of cells){ grid[r][c].el.classList.add('win'); setWinLook(grid[r][c].el, w.s, true); }
@@ -1539,7 +1614,7 @@ async function playBook(events, b, mode){
       case 'freeSpinEnd':
         await closeSpin();
         fsTotal=e.total; banner();
-        if(e.maxed) await maxWinScreen(e.total/10*b);
+        if(e.maxed) await maxWinScreen(e.total/10*b); else SFX.fsEnd&&SFX.fsEnd();
         await modal(`<div class="kicker">${e.maxed?T.maxed:T.over}</div><div class="big">${fmt(e.total/10*b)}</div><p class="endline">${T.inSpins(e.played)}</p>`, [[T.cont,1]]);
         fsFlash(); document.body.classList.remove('fs'); $('fsBanner').hidden=true; Music.setIntensity(false);
         inFS=false; inBonus=false; resetSpots();
@@ -1783,7 +1858,7 @@ function paintMute(){ $('muteIcon').innerHTML = muted ? '<path d="M4 9v6h4l5 4V5
 $('muteBtn').onclick=()=>{ muted=!muted; try{ localStorage.setItem('cb-muted',muted?'1':'0'); }catch(e){} paintMute(); A(); SFX.click(); Music.play(); };
 /* [228] barre espace : toujours un spin (hors fenêtres et listes), jamais un clic sur le bouton qui a le focus */
 addEventListener('keydown',e=>{ if(e.code!=='Space' && e.key!==' ') return;
-  if(document.querySelector('.ov,.bigwin,.boot')){ e.preventDefault(); e.stopPropagation(); return; }   // jamais de validation d'une fenêtre (achat, autoplay) à la barre espace
+  if(document.querySelector('.ov,.bigwin,.boot,.sb-splash')){ e.preventDefault(); e.stopPropagation(); return; }   // jamais de validation d'une fenêtre (achat, autoplay) à la barre espace
   if(JUR.disabledSpacebar || REPLAY || document.activeElement.tagName==='SELECT') return;
   e.preventDefault(); if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); A(); if(!e.repeat) spin(); }, true);
 addEventListener('pointerup',()=>{ const a=document.activeElement; if(a && a.tagName==='BUTTON') a.blur(); });
@@ -1809,7 +1884,7 @@ function applyLang(){
   const tip=(id,t)=>{ const el=$(id); if(el){ el.title=t; el.setAttribute('aria-label',t); } };
   tip('musicBtn',T.music); tip('rulesBtn',T.rulesTip); tip('betDown',T.dec); tip('betUp',T.inc); tip('spinBtn',T.spinAria);
   document.documentElement.lang = LANG; paintMute();
-  set('tWinLbl',T.win); set('tLadder',LANG==='fr'?'Multiplicateurs':'Multipliers'); set('tAutoLbl',LANG==='fr'?'Spins automatiques':'Autoplay');
+  set('tWinLbl',T.win); set('tBetLbl',T.bet); set('tLadder',LANG==='fr'?'Multiplicateurs':'Multipliers'); set('tAutoLbl',LANG==='fr'?'Spins automatiques':'Autoplay');
   tip('autoBtn',LANG==='fr'?'Spins automatiques':'Autoplay'); tip('turboBtn','Turbo'); tip('muteBtn',muted?T.soundOn:T.soundOff);
 }
 function applyJurisdiction(){
@@ -1873,6 +1948,7 @@ async function runReplay(){
     setBalance(d.balance ? d.balance.amount/1e6 : 0);
     setInterval(()=>Backend.balance(), 60000);
     ready = true; busy = false; bootDone(); updateUI();
+    await sbSplash();
     const pending = Backend.pendingRound();
     if(pending){
       const b = pending.amount ? pending.amount/1e6 : bet(); const i = BETS.indexOf(b); if(i>=0) betIdx=i;
@@ -1901,6 +1977,77 @@ function ringFX(x,y,color,big){ if(reduced) return; const cs=cellSize();
 function multFX(x,y,color){ if(reduced) return; const cs=cellSize();
   P({kind:'ring',x,y,size:cs*.12,grow:cs*.03,decay:.07,color}); burst(x,y,color,6); }
 function fsFlash(){ if(reduced) return; const f=document.createElement('div'); f.className='sb-flash'; document.body.appendChild(f); setTimeout(()=>f.remove(),950); }
+/* ---- sons : vrais fichiers audio (repli sur la synthèse s'ils ne sont pas chargés) ; tout passe par « muted » ---- */
+const Snd=(()=>{ const names=['click','spin','land','win','pop','mult','scatter','tension','trigger','big','coin','fsEnd']; const buf={}; let started=false, master=null;
+  function load(){ if(started) return; const a=A(); if(!a) return; started=true; master=a.createGain(); master.gain.value=.85; master.connect(a.destination);
+    names.forEach(n=>fetch(`theme/halloween/sfx/${n}.mp3`).then(r=>r.arrayBuffer()).then(b=>a.decodeAudioData(b)).then(d=>{ buf[n]=d; }).catch(()=>{})); }
+  function play(n,o={}){ if(muted) return true; const a=A(); if(!a) return false; if(!buf[n]){ load(); return false; }
+    const s=a.createBufferSource(); s.buffer=buf[n]; s.playbackRate.value=o.rate||1; const g=a.createGain(); g.gain.value=o.vol==null?1:o.vol; s.connect(g).connect(master); s.start(a.currentTime+(o.delay||0)); return true; }
+  return {load,play}; })();
+(function(){ const S={...SFX}, L=[2,3,5,10,25,50,100];
+  Object.assign(SFX,{
+    click:()=>Snd.play('click',{vol:.55})||S.click(),
+    land:c=>Snd.play('land',{rate:.9+c*.035,vol:.42})||S.land(c),
+    pop:()=>Snd.play('pop',{rate:.9+rnd()*.25,vol:.7})||S.pop(),
+    mark:()=>Snd.play('mult',{rate:.8,vol:.35})||S.mark(),
+    mult:v=>Snd.play('mult',{rate:1+Math.max(0,L.indexOf(v))*.09,vol:.65})||S.mult(v),
+    win:(step=1)=>Snd.play('win',{rate:Math.pow(2,Math.min(step-1,8)*2/12),vol:.7})||S.win(step),
+    tension:k=>Snd.play('tension',{rate:1+k*.07,vol:.6})||S.tension(k),
+    whoosh:()=>Snd.play('spin',{vol:.5})||S.whoosh(),
+    scatter:i=>Snd.play('scatter',{rate:1+i*.12,vol:.8})||S.scatter(i),
+    trigger:()=>Snd.play('trigger',{vol:.85})||S.trigger(),
+    big:()=>Snd.play('big',{vol:.85})||S.big(),
+    coin:()=>Snd.play('coin',{rate:.85+rnd()*.35,vol:.28})||S.coin(),
+    fsEnd:()=>Snd.play('fsEnd',{vol:.8})
+  });
+  addEventListener('pointerdown',()=>Snd.load(),{once:true}); addEventListener('keydown',()=>Snd.load(),{once:true});
+})();
+/* ---- décor animé : chauves-souris et braises ---- */
+(function(){ const amb=document.querySelector('.sb-amb'); if(!amb || reduced) return;
+  const bat='<svg viewBox="0 0 100 50"><path d="M50 18 C46 12 42 12 40 16 C32 6 18 4 2 12 C10 16 12 22 10 30 C18 24 26 26 30 34 C34 28 40 28 44 34 Q47 30 50 34 Q53 30 56 34 C60 28 66 28 70 34 C74 26 82 24 90 30 C88 22 90 16 98 12 C82 4 68 6 60 16 C58 12 54 12 50 18Z"/></svg>';
+  amb.querySelector('.bats').innerHTML=[0,1,2,3].map(i=>`<div class="bat" style="--s:${18+i*7}px;--y:${8+i*9}%;--d:${16+i*5}s;--w:${-i*6.5}s">${bat}</div>`).join('');
+  amb.querySelector('.motes').innerHTML=Array.from({length:14},(_,i)=>`<div class="mote" style="--x:${(i*7.3+rnd()*5)%100}%;--s:${3+rnd()*5}px;--d:${9+rnd()*9}s;--w:${-rnd()*15}s;--dx:${(rnd()-.5)*12}vw"></div>`).join('');
+})();
+/* ---- multiplicateurs qui volent vers le gain du groupe ---- */
+function flyMults(wins){ if(reduced) return; const fl=floatsEl;
+  for(const w of wins){ if(!w.m) continue; let sr=0,sc=0; for(const i of w.c){ sr+=(i/COLS)|0; sc+=i%COLS; } sr/=w.c.length; sc/=w.c.length;
+    let k=0; for(const i of w.c){ const r=(i/COLS)|0, c=i%COLS, v=spots[r][c]; if(v<2) continue;
+      const ch=document.createElement('span'); ch.className='flychip'; ch.textContent='x'+v; ch.style.setProperty('--t',MULT_COLORS[v]||'#fff');
+      ch.style.left=((c+.5)*100/COLS)+'%'; ch.style.top=((r+.5)*100/ROWS)+'%'; fl.appendChild(ch);
+      const bw=board.getBoundingClientRect().width/COLS, dx=(sc-c)*bw, dy=(sr-r)*bw;
+      ch.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.5)`,opacity:.2}],{duration:380,delay:k*30,easing:'cubic-bezier(.55,0,.85,.4)',fill:'forwards'});
+      setTimeout(()=>ch.remove(),420+k*30); k++; } } }
+/* ---- panneau des mises ---- */
+(function(){ const cell=$('betCell'), panel=$('betPanel');
+  const close=()=>{ panel.hidden=true; cell.setAttribute('aria-expanded','false'); };
+  const open=()=>{ if(!ready||busy||inFS||REPLAY){ return; } A(); SFX.click();
+    if(!panel.hidden){ close(); return; }
+    panel.querySelector('.chips').innerHTML=BETS.map((v,i)=>`<button type="button" data-i="${i}" class="${i===betIdx?'cur':''}">${fmt(v)}</button>`).join('');
+    panel.querySelectorAll('button').forEach(b=>b.onclick=()=>{ betIdx=+b.dataset.i; SFX.click(); updateUI(); close(); });
+    panel.hidden=false; cell.setAttribute('aria-expanded','true');
+    const r=cell.getBoundingClientRect(), pw=panel.offsetWidth;
+    panel.style.left=Math.max(8,Math.min(innerWidth-pw-8, r.left+r.width/2-pw/2))+'px'; panel.style.bottom=(innerHeight-r.top+8)+'px'; };
+  cell.onclick=open; cell.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); open(); } };
+  addEventListener('pointerdown',e=>{ if(!panel.hidden && !panel.contains(e.target) && !cell.contains(e.target)) close(); });
+  addEventListener('resize',close);
+})();
+/* ---- écran d'accueil ---- */
+function sbSplash(){ return new Promise(res=>{
+  const fr=LANG==='fr', L=[2,3,5,10,25,50,100], syms=[1,3,0,5,4];
+  const el=document.createElement('div'); el.className='sb-splash'; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true');
+  el.innerHTML=`<div class="in"><h1 class="logo" aria-label="Spooky Burst">${[...'SPOOKY'].map(c=>`<span>${c}</span>`).join('')}<b>BURST</b></h1>
+    <div class="demo">${syms.map(s=>`<div class="cell"><img src="theme/halloween/symbols/${s}.png" alt=""><b style="--t:${MULT_COLORS[2]}">x2</b></div>`).join('')}</div>
+    <div class="tag">${fr?'Les multiplicateurs grimpent jusqu’à x100':'Multipliers climb up to x100'}</div>
+    <div class="feats"><span>${fr?'Groupes de 5+ symboles':'Clusters of 5+ symbols'}</span><span>${fr?'Les cases restent pendant les free spins':'Spots stay during free spins'}</span><span>${fr?'Gain max 25 000×':'Max win 25,000×'}</span></div>
+    <button type="button" class="go">${fr?'Jouer':'Play'}</button></div>`;
+  document.body.appendChild(el);
+  const cells=[...el.querySelectorAll('.cell')]; let step=0;
+  const tick=setInterval(()=>{ const c=cells[step%cells.length], b=c.querySelector('b'), cur=L.indexOf(+b.textContent.slice(1)), nv=L[(cur+1)%L.length];
+    b.textContent='x'+nv; b.style.setProperty('--t',MULT_COLORS[nv]); c.style.setProperty('--t',MULT_COLORS[nv]); c.classList.remove('lit'); void c.offsetWidth; c.classList.add('lit'); step++; }, 420);
+  const done=()=>{ if(el.classList.contains('out')) return; clearInterval(tick); A(); Snd.load(); Music.kick(); SFX.click(); el.classList.add('out'); setTimeout(()=>{ el.remove(); res(); },450); removeEventListener('keydown',key,true); };
+  const key=e=>{ if(e.key==='Enter'||e.code==='Space'||e.key===' '){ e.preventDefault(); done(); } };
+  el.onclick=done; addEventListener('keydown',key,true); el.querySelector('.go').focus({preventScroll:true});
+}); }
 /* échelle des multiplicateurs (colonne de droite) */
 (function(){ const c=document.querySelector('#ladder .chips'); if(c) c.innerHTML=Object.entries(MULT_COLORS).map(([v,col])=>`<span style="--t:${col}">x${v}</span>`).join(''); })();
 /* autoplay : bouton + panneau de choix (puis la confirmation existante) */
