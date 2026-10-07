@@ -28,6 +28,17 @@
 | 6 | Araignée | a shiny golden-yellow cartoon spider hanging from a silk thread, dark purple segmented legs with golden joints, big cute eyes, diamond markings on its back, |
 | 7 | Lune de sang (Bonus) | a glowing blood-red full moon with craters and a black bat silhouette flying across it, surrounded by an intense red corona glow and light rays, magical and powerful looking, |
 
+## Option « une seule demande » : planche des 8 symboles
+
+Si tu ne peux faire qu'une seule génération, demande les 8 symboles sur une même planche. Je la découperai moi-même en 8 images.
+
+> A sprite sheet of 8 Halloween slot game symbol icons arranged in a clean grid of 4 columns and 2 rows, all in exactly the same art style: hand-painted cartoon game icons with thick dark outlines, soft cel shading, subtle painted texture, glossy highlights, a soft dark shadow under each icon and a few small white sparkle stars, rich but slightly muted colors, uniform dark warm brown background, every icon fully visible, same size, evenly spaced with wide empty gaps between them, front view. Top row from left to right: a black iron witch cauldron overflowing with glowing green potion and bubbles; a carved jack-o'-lantern pumpkin glowing orange inside with a curly green stem; an ivory skull with glowing red eyes and a small crack; a cute white floating ghost with big dark eyes and pink cheeks. Bottom row from left to right: a purple bat with wings spread and glowing yellow eyes; a round glass potion flask with glowing pink liquid and a cork; a shiny golden cartoon spider hanging from a thread with purple legs; a glowing blood-red full moon with a black bat silhouette and a red glow ring. No text, no letters, no labels, keep the top right corner empty.
+
+**Astuces :**
+- Si l'outil accepte une **image de référence**, donne-lui la planche d'exemple (épées, potions, casque) comme modèle de style.
+- Format conseillé : paysage 2:1 (par exemple 2048 × 1024), ou le plus grand format disponible.
+- Le coin en haut à droite reste vide exprès : si la version gratuite ajoute son filigrane à cet endroit, je le couperai en découpant la planche.
+
 ## Les décors (16:9, 1920 × 1080)
 
 **Jeu de base :**
