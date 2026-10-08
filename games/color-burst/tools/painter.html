@@ -101,9 +101,9 @@ function branch(x,y,len,ang,w,depth){
 function tree(x,y,len,ang,w){ X.lineCap='round'; X.lineJoin='round';
   const s=seed; X.save(); X.translate(3,-1); X.strokeStyle=RIM; X.globalAlpha=.6; branch(x,y,len,ang,w,6); X.restore();
   seed=s; X.strokeStyle=FS?'#0a0001':'#06010a'; branch(x,y,len,ang,w,6); }
-const clipTree=(x0,x1,fn)=>{ X.save(); X.beginPath(); X.rect(x0,0,x1-x0,H); X.clip(); fn(); X.restore(); };
-seed=101; clipTree(0,470,()=>{ tree(150,920,300,-1.5,34); tree(40,940,200,-1.3,20); });
-seed=202; clipTree(1340,W,()=>{ tree(1500,930,300,-1.62,36); tree(1590,940,200,-1.85,20); });
+const clipTree=(x0,x1,fn,y0=0)=>{ X.save(); X.beginPath(); X.rect(x0,y0,x1-x0,H-y0); X.clip(); fn(); X.restore(); };
+seed=101; clipTree(0,470,()=>{ tree(150,920,300,-1.5,34); tree(40,940,200,-1.3,20); },300);
+seed=202; clipTree(1150,W,()=>{ tree(1580,930,240,-1.28,34); tree(1610,940,180,-1.55,20); });
 // brume au sol
 noiseLayer((x,y)=>{ if(y<640) return [0,0,0,0]; const n=fbm(x/300,y/90,5); const t=Math.min(1,(y-640)/180); const a=Math.max(0,n-.35)*1.6*t;
   return FS?[255,110,60,255*Math.min(.55,a)]:[185,166,214,255*Math.min(.42,a)]; },4);
