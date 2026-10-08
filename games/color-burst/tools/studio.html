@@ -221,7 +221,11 @@ const FX = {
   6:(c,S,p,ps)=>{ ps.s.forEach((q,k)=>{ const t=(p+q.ph)%1; c.save(); c.globalAlpha=1-t; c.translate(S*.5+Math.cos(q.a)*t*S*.45,S*.5+Math.sin(q.a)*t*S*.45); c.rotate(t*8+q.a); c.fillStyle=['#ffd23f','#ff8c1a','#fff8ec'][k%3]; c.fillRect(-S*.015,-S*.008,S*.03,S*.016); c.restore(); }); },
   7:(c,S,p,ps)=>{ c.save(); c.globalCompositeOperation='lighter'; for(let k=0;k<16;k++){ const a=k/16*6.283+p*6.283/4, l=S*(.36+.08*Math.sin(p*6.283*2+k)); const g=c.createLinearGradient(S/2,S/2,S/2+Math.cos(a)*l,S/2+Math.sin(a)*l); g.addColorStop(0,'rgba(255,80,60,.6)'); g.addColorStop(1,'rgba(255,0,0,0)'); c.strokeStyle=g; c.lineWidth=S*.02; c.beginPath(); c.moveTo(S/2,S/2); c.lineTo(S/2+Math.cos(a)*l,S/2+Math.sin(a)*l); c.stroke(); } c.restore(); }
 };
-let IMGS={};
+let IMGS={}, RAW={};
+// symboles fournis en image (planche IA) : dessinés tels quels, avec une lueur
+async function useImage(i,url){ IMGS[i]=await new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.src=url; }); RAW[i]=true; }
+function drawRaw(c,im,i,S,o){ c.save(); c.translate(S/2+(o.dx||0),S/2+(o.dy||0)); c.rotate(o.rot||0); const k=(o.scale||1)*1.05; c.scale(k,k);
+  c.shadowColor=GLOW[i]; c.shadowBlur=S*.07*(o.glow||0); c.drawImage(im,-S/2,-S/2,S,S); c.shadowBlur=S*.025; c.drawImage(im,-S/2,-S/2,S,S); c.restore(); }
 async function winFrame(i,f,N,S=256){
   if(!IMGS[i]) IMGS[i]=await svgImg(i);
   const cv=document.createElement('canvas'); cv.width=cv.height=S; const c=cv.getContext('2d'); const p=f/N, w=Math.sin(p*6.283);
@@ -236,11 +240,11 @@ async function winFrame(i,f,N,S=256){
   if(i===7){ o.rot=p*6.283/8; }
   if(i===7) FX[7](c,S,p,ps);
   c.save(); if(i===4){ c.translate(S/2,S/2); c.scale(1+.15*Math.sin(p*6.283*4),1-.12*Math.sin(p*6.283*4)); c.translate(-S/2,-S/2); }
-  paintSymbol(c,IMGS[i],i,S,o); c.restore();
+  if(RAW[i]) drawRaw(c,IMGS[i],i,S,o); else paintSymbol(c,IMGS[i],i,S,o); c.restore();
   if(!BEHIND.includes(i) && i!==0) FX[i](c,S,p,ps);   // effets devant (chauves-souris, confettis)
   if(i===0) FX[0](c,S,(p+.5)%1,{f:parts(10,900),b:[],s:[]});
   return cv.toDataURL('image/png');
 }
-window.studio={symbolPNG,winFrame};
+window.studio={symbolPNG,winFrame,useImage};
 document.title='ready';
 </script>

@@ -727,6 +727,9 @@ body .sb .sym.s6.win .in{animation:wSpider .55s cubic-bezier(.4,1.6,.6,1) infini
 @keyframes wSpider{from{transform:translateY(-12%) scale(1.04)}to{transform:translateY(6%) scale(1.14,1.06)}}
 .sb .sym.win .in::after{content:"";position:absolute;inset:10%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--wc) 55%,transparent),transparent 70%);z-index:-1;animation:wAura .5s ease-in-out infinite alternate}
 .sb .sym .in{position:relative;isolation:isolate}
+/* avec l'animation dessinée (flammes, bulles, chauves-souris…), pas de mouvement ni d'aura en plus */
+body .sb .sym.win .in:has(.winimg){animation:none}
+.sb .sym.win .in:has(.winimg)::after{display:none}
 @keyframes wAura{from{transform:scale(.8);opacity:.6}to{transform:scale(1.25);opacity:1}}
 
 /* ---- multiplicateurs qui volent vers le gain ---- */
@@ -1215,7 +1218,7 @@ function symSVG(s){
   if(assetOK[img]) return `<img class="symimg" src="${img}" alt="" draggable="false">`;
   return `<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${THEMES[themeId].prefix}${s}"/></svg>`;
 }
-function setWinLook(el,s,on){ if(themeId==='halloween') return;
+function setWinLook(el,s,on){
   const w=themeAsset('win',s); if(!assetOK[w]) return;
   const box=el.querySelector('.in'); if(!box) return;
   box.innerHTML = on ? `<img class="symimg winimg${THEMES[themeId].winBlend==='screen'?' screen':''}" src="${w}" alt="" draggable="false">` : symSVG(s);
@@ -1786,7 +1789,7 @@ setInterval(paintSession, 1000);
 
 /* une partie : demande au serveur, animation, fin de partie */
 async function playRound(mode, b, resumeEvents){
-  busy=true; resetSpots(); updateUI();
+  busy=true; closePanels(); resetSpots(); updateUI();
   const t0 = Date.now();
   let events = resumeEvents;
   if(!events){
@@ -1858,7 +1861,7 @@ function paintMute(){ $('muteIcon').innerHTML = muted ? '<path d="M4 9v6h4l5 4V5
 $('muteBtn').onclick=()=>{ muted=!muted; try{ localStorage.setItem('cb-muted',muted?'1':'0'); }catch(e){} paintMute(); A(); SFX.click(); Music.play(); };
 /* [228] barre espace : toujours un spin (hors fenêtres et listes), jamais un clic sur le bouton qui a le focus */
 addEventListener('keydown',e=>{ if(e.code!=='Space' && e.key!==' ') return;
-  if(document.querySelector('.ov,.bigwin,.boot,.sb-splash')){ e.preventDefault(); e.stopPropagation(); return; }   // jamais de validation d'une fenêtre (achat, autoplay) à la barre espace
+  if(document.querySelector('.ov,.bigwin,.boot,.sb-splash,.sb-autopanel:not([hidden])')){ e.preventDefault(); e.stopPropagation(); return; }   // jamais de validation d'une fenêtre (achat, autoplay) à la barre espace
   if(JUR.disabledSpacebar || REPLAY || document.activeElement.tagName==='SELECT') return;
   e.preventDefault(); if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); A(); if(!e.repeat) spin(); }, true);
 addEventListener('pointerup',()=>{ const a=document.activeElement; if(a && a.tagName==='BUTTON') a.blur(); });
@@ -2017,6 +2020,9 @@ function flyMults(wins){ if(reduced) return; const fl=floatsEl;
       const bw=board.getBoundingClientRect().width/COLS, dx=(sc-c)*bw, dy=(sr-r)*bw;
       ch.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.5)`,opacity:.2}],{duration:380,delay:k*30,easing:'cubic-bezier(.55,0,.85,.4)',fill:'forwards'});
       setTimeout(()=>ch.remove(),420+k*30); k++; } } }
+/* ---- [228] Espace avec un panneau ouvert : on ferme le panneau, aucun spin ---- */
+function closePanels(){ let was=false; for(const id of ['autoPanel','betPanel']){ const el=$(id); if(el && !el.hidden){ el.hidden=true; was=true; } } return was; }
+addEventListener('keydown',e=>{ if((e.code==='Space'||e.key===' ') && closePanels()){ e.preventDefault(); } },true);
 /* ---- panneau des mises ---- */
 (function(){ const cell=$('betCell'), panel=$('betPanel');
   const close=()=>{ panel.hidden=true; cell.setAttribute('aria-expanded','false'); };

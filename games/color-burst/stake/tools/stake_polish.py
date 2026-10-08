@@ -355,6 +355,9 @@ body .sb .sym.s6.win .in{animation:wSpider .55s cubic-bezier(.4,1.6,.6,1) infini
 @keyframes wSpider{from{transform:translateY(-12%) scale(1.04)}to{transform:translateY(6%) scale(1.14,1.06)}}
 .sb .sym.win .in::after{content:"";position:absolute;inset:10%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--wc) 55%,transparent),transparent 70%);z-index:-1;animation:wAura .5s ease-in-out infinite alternate}
 .sb .sym .in{position:relative;isolation:isolate}
+/* avec l'animation dessinée (flammes, bulles, chauves-souris…), pas de mouvement ni d'aura en plus */
+body .sb .sym.win .in:has(.winimg){animation:none}
+.sb .sym.win .in:has(.winimg)::after{display:none}
 @keyframes wAura{from{transform:scale(.8);opacity:.6}to{transform:scale(1.25);opacity:1}}
 
 /* ---- multiplicateurs qui volent vers le gain ---- */
@@ -446,6 +449,9 @@ function flyMults(wins){ if(reduced) return; const fl=floatsEl;
       const bw=board.getBoundingClientRect().width/COLS, dx=(sc-c)*bw, dy=(sr-r)*bw;
       ch.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.5)`,opacity:.2}],{duration:380,delay:k*30,easing:'cubic-bezier(.55,0,.85,.4)',fill:'forwards'});
       setTimeout(()=>ch.remove(),420+k*30); k++; } } }
+/* ---- [228] Espace avec un panneau ouvert : on ferme le panneau, aucun spin ---- */
+function closePanels(){ let was=false; for(const id of ['autoPanel','betPanel']){ const el=$(id); if(el && !el.hidden){ el.hidden=true; was=true; } } return was; }
+addEventListener('keydown',e=>{ if((e.code==='Space'||e.key===' ') && closePanels()){ e.preventDefault(); } },true);
 /* ---- panneau des mises ---- */
 (function(){ const cell=$('betCell'), panel=$('betPanel');
   const close=()=>{ panel.hidden=true; cell.setAttribute('aria-expanded','false'); };
@@ -545,8 +551,6 @@ def apply(s):
     sub("const machine=document.querySelector('.machine');", "const machine=document.querySelector('.sb-stage');")
     # icônes : le bouton son garde son pictogramme ; le bouton règles n'a plus de texte « ? »
     sub("</script>\n</body>", JS + "</script>\n</body>")
-    # ---- animations de gain : on garde le symbole net (animation CSS propre à chacun) au lieu de la petite vidéo
-    sub("function setWinLook(el,s,on){\n", "function setWinLook(el,s,on){ if(themeId==='halloween') return;\n")
     # ---- multiplicateurs qui volent vers le gain
     sub("  lastWins = e.wins; drawOutlines(e.wins);\n", "  lastWins = e.wins; drawOutlines(e.wins); flyMults(e.wins);\n")
     # ---- son de fin de bonus
@@ -554,7 +558,9 @@ def apply(s):
     # ---- écran d'accueil après l'authentification (avant la reprise d'une partie en cours)
     sub("    ready = true; busy = false; bootDone(); updateUI();\n", "    ready = true; busy = false; bootDone(); updateUI();\n    await sbSplash();\n")
     # la barre espace ne lance rien sous l'écran d'accueil
-    sub("  if(document.querySelector('.ov,.bigwin,.boot')){", "  if(document.querySelector('.ov,.bigwin,.boot,.sb-splash')){")
+    sub("  if(document.querySelector('.ov,.bigwin,.boot')){", "  if(document.querySelector('.ov,.bigwin,.boot,.sb-splash,.sb-autopanel:not([hidden])')){")
+    # les panneaux se ferment au début de chaque partie
+    sub("  busy=true; resetSpots(); updateUI();\n  const t0 = Date.now();", "  busy=true; closePanels(); resetSpots(); updateUI();\n  const t0 = Date.now();")
     # le libellé du panneau des mises suit la langue et le mode social
     sub("  set('tWinLbl',T.win);", "  set('tWinLbl',T.win); set('tBetLbl',T.bet);")
     return s
